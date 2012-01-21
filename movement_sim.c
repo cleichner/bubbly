@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #include "maze.h"
-#include "movements.h"
+#include "movement.h"
 
 #define CHAR_WIDTH 2*WIDTH+1
 #define CHAR_HEIGHT HEIGHT+1
@@ -35,32 +35,33 @@ void initialize_movements(int argc, char* argv[]) {
     FILE* stream = fopen(argv[1], "r");
     assert(stream && "Maze-file could not be opened for reading.\n");
 
-    int8_t i = 0;
-    int8_t j = HEIGHT;
+    int8_t col = 0;
+    int8_t row = HEIGHT;
     int8_t k = 0;
 
-    /* top line */
-    accept(space, "a space", &chars[i][j], fgetc(stream)); i++;
+    /* parse top line */
+    accept(space, "a space", &chars[col][row], fgetc(stream)); col++;
     for (k = 0; k < WIDTH-1; k++) {
-        accept(underscore, "an underscore", &chars[i][j], fgetc(stream)); i++;
-        accept(space, "a space", &chars[i][j], fgetc(stream)); i++;
+        accept(underscore, "an underscore", &chars[col][row], fgetc(stream)); col++;
+        accept(space, "a space", &chars[col][row], fgetc(stream)); col++;
     }
-    accept(underscore, "an underscore", &chars[i][j], fgetc(stream)); i++;
-    ignore_trailing_whitespace(stream);  i=0; j--;
+    accept(underscore, "an underscore", &chars[col][row], fgetc(stream)); col++;
+    ignore_trailing_whitespace(stream);  col=0; row--;
 
+    /* parse body */
     for (k = 0; k < HEIGHT; k++) {
-        accept(pipe, "a pipe", &chars[i][j], fgetc(stream)); i++;
+        accept(pipe, "a pipe", &chars[col][row], fgetc(stream)); col++;
         int8_t l = 0;
         for (l = 0; l < WIDTH-1; l++) {
-            accept(underscore_or_space, "an underscore or space", &chars[i][j],
-                   fgetc(stream)); i++;
-            accept(pipe_or_space, "a pipe or space", &chars[i][j],
-                   fgetc(stream)); i++;
+            accept(underscore_or_space, "an underscore or space", &chars[col][row],
+                   fgetc(stream)); col++;
+            accept(pipe_or_space, "a pipe or space", &chars[col][row],
+                   fgetc(stream)); col++;
         }
-        accept(underscore_or_space, "an underscore or space", &chars[i][j],
-                fgetc(stream)); i++;
-        accept(pipe, "a pipe", &chars[i][j], fgetc(stream)); i++;
-        ignore_trailing_whitespace(stream); i=0; j--;
+        accept(underscore_or_space, "an underscore or space", &chars[col][row],
+                fgetc(stream)); col++;
+        accept(pipe, "a pipe", &chars[col][row], fgetc(stream)); col++;
+        ignore_trailing_whitespace(stream); col=0; row--;
     }
     fclose(stream);
 

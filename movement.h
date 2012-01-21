@@ -3,14 +3,14 @@
 
 #include <stdbool.h>
 
-typedef enum{
+typedef enum {
     FRONT,
     LEFT,
     RIGHT,
 } direction_t;
 
 // Any initialization that needs to happen in the main function.
-void initialize_movements(void);
+void initialize_movements(int argc, char* argv[]);
 
 // Move one square forward.
 void move_forward(void);

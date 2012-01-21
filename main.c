@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "maze.h"
-#include "movements.h"
+#include "movement.h"
 
 void init_maze(struct cell maze[WIDTH][HEIGHT]) {
     int8_t i;

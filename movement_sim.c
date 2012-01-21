@@ -42,7 +42,8 @@ void initialize_movements(int argc, char* argv[]) {
     /* parse top line */
     accept(space, "a space", &chars[col][row], fgetc(stream)); col++;
     for (k = 0; k < WIDTH-1; k++) {
-        accept(underscore, "an underscore", &chars[col][row], fgetc(stream)); col++;
+        accept(underscore, "an underscore", &chars[col][row], fgetc(stream));
+        col++;
         accept(space, "a space", &chars[col][row], fgetc(stream)); col++;
     }
     accept(underscore, "an underscore", &chars[col][row], fgetc(stream)); col++;
@@ -53,8 +54,8 @@ void initialize_movements(int argc, char* argv[]) {
         accept(pipe, "a pipe", &chars[col][row], fgetc(stream)); col++;
         int8_t l = 0;
         for (l = 0; l < WIDTH-1; l++) {
-            accept(underscore_or_space, "an underscore or space", &chars[col][row],
-                   fgetc(stream)); col++;
+            accept(underscore_or_space, "an underscore or space",
+                   &chars[col][row], fgetc(stream)); col++;
             accept(pipe_or_space, "a pipe or space", &chars[col][row],
                    fgetc(stream)); col++;
         }

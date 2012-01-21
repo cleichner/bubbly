@@ -14,9 +14,9 @@
 # .PHONY: clean
 
 all:
-	clang -c -Wall -Werror -Wextra  movements.c 
+	clang -c -Wall -Werror -Wextra  movement_sim.c 
 	clang -c -Wall -Werror -Wextra main.c       
-	clang -lcurses -o bubbly main.o movements.o
+	clang -lcurses -o softbot main.o movement_sim.o
 
 clean:
 	rm -f *.o bubbly #$(PRG)

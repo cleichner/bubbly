@@ -14,7 +14,7 @@
 # .PHONY: clean
 
 all:
-	clang -g -c -Wall -Werror -Wextra  movement_sim.c 
+	clang -g -c -Wall -Werror -Wextra movement_sim.c 
 	clang -g -c -Wall -Werror -Wextra main.c       
 	clang -g -lcurses -o softbot main.o movement_sim.o
 

@@ -68,7 +68,7 @@ void print_maze(struct cell maze[WIDTH][HEIGHT]) {
 
 int main(int argc, char* argv[]) {
     struct cell maze[WIDTH][HEIGHT];
-    initialize_movements(argc, argv);
+    initialize_movement(argc, argv);
     init_maze(maze);
     connect_maze(maze);
 //  print_maze(maze);

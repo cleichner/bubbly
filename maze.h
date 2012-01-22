@@ -13,4 +13,6 @@ struct cell {
     struct cell* west;
 };
 
+void init_maze(struct cell maze[WIDTH][HEIGHT]);
+void print_maze(struct cell maze[WIDTH][HEIGHT]);
 #endif // MAZE_H

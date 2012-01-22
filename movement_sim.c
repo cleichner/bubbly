@@ -23,7 +23,7 @@ static bool underscore_or_space(char cur) {
 }
 static bool pipe_or_space(char cur) { return pipe(cur) || space(cur); }
 
-// static struct cell maze[WIDTH][HEIGHT];
+static struct cell maze[WIDTH][HEIGHT];
 
 void initialize_movements(int argc, char* argv[]) {
     if (argc != 2) {
@@ -66,14 +66,49 @@ void initialize_movements(int argc, char* argv[]) {
     }
     fclose(stream);
 
-    int8_t l;
-    for (l = CHAR_HEIGHT-1; l >= 0; l--) {
-        for (k = 0; k < CHAR_WIDTH; k++) {
-            printf("%c", chars[k][l]);
+    int8_t i = 0;
+    int8_t j = 0;
+    int8_t l = 0;
+    init_maze(maze);
+    for (l = CHAR_HEIGHT-2; l >= 0; l--) {
+        for (k = 1; k < CHAR_WIDTH-1; k+=2) {
+            if (chars[k][l+1] == '_') {
+                maze[i][j].south = NULL;
+            } else if (chars[k][l+1] == ' ') {
+                maze[i][j].south = &(maze[i][j+1]);
+            } else {
+                assert(false && "unknown character in maze");
+            }
+
+            if (chars[k][l] == '_') {
+                maze[i][j].north = NULL;
+            } else if (chars[k][l] == ' ') {
+                maze[i][j].north = &(maze[i][j-1]);
+            } else {
+                assert(false && "unknown character in maze");
+            }
+
+            if (chars[k+1][l] == '|') {
+                maze[i][j].east = NULL;
+            } else if (chars[k+1][l] == ' ') {
+                maze[i][j].east = &(maze[i+1][j]);
+            } else {
+                assert(false && "unknown character in maze");
+            }
+
+            if (chars[k-1][l] == '|') {
+                maze[i][j].west = NULL;
+            } else if (chars[k-1][l] == ' ') {
+                maze[i][j].west = &(maze[i-1][j]);
+            } else {
+                assert(false && "unknown character in maze");
+            }
+            i++;
         }
-        printf("\n");
+        i = 0;
+        j++;
     }
-    printf("\n");
+    print_maze(maze);
 }
 
 static void accept(bool (*accept_f)(char), char* name, char* dest, char cur) {

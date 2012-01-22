@@ -10,8 +10,8 @@ void init_maze(struct cell maze[WIDTH][HEIGHT]) {
     int8_t j;
     for (i = 0; i < WIDTH; i++) {
         for (j = 0; j < HEIGHT; j++) {
-            maze[i][j].x = 0;
-            maze[i][j].y = 0;
+            maze[i][j].x = i;
+            maze[i][j].y = j;
             maze[i][j].north = NULL;
             maze[i][j].south = NULL;
             maze[i][j].east = NULL;
@@ -25,8 +25,6 @@ void connect_maze(struct cell maze[WIDTH][HEIGHT]) {
     int8_t j;
     for (i = 0; i < WIDTH; i++) {
         for (j = 0; j < HEIGHT; j++) {
-            maze[i][j].x = i;
-            maze[i][j].y = j;
             if (j != HEIGHT-1) {
                 maze[i][j].north = &(maze[i][j+1]);
             }

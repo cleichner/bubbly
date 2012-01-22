@@ -25,7 +25,7 @@ static bool pipe_or_space(char cur) { return pipe(cur) || space(cur); }
 
 // static struct cell maze[WIDTH][HEIGHT];
 
-void initialize_movements(int argc, char* argv[]) {
+void initialize_movement(int argc, char* argv[]) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s maze-file\n", argv[0]);
         exit(1);

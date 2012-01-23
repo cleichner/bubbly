@@ -14,6 +14,7 @@
 static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream);
 static void make_graph(struct cell maze[WIDTH][HEIGHT],
                        char chars[CHAR_WIDTH][CHAR_HEIGHT]);
+static void print_maze(struct cell maze[WIDTH][HEIGHT]);
 
 static void accept(bool (*accept_f)(char), char* name, char* dest, char cur);
 static bool space(char cur) { return cur == ' ' || cur == '\t'; }
@@ -120,5 +121,30 @@ static void ignore_trailing_whitespace(FILE* stream) {
     }
     char _;
     accept(newline, "a newline", &_, cur);
+}
+
+static void print_maze(struct cell maze[WIDTH][HEIGHT]) {
+    int8_t i;
+    int8_t j;
+    for (i = 0; i < WIDTH; i++) {
+        for (j = 0; j < HEIGHT; j++) {
+            printf("maze[%d][%d]\n", i, j);
+            if (maze[i][j].north != NULL)
+                printf("maze[%d][%d].north = (%d,%d)\n", i, j, maze[i][j].north->x,
+                        maze[i][j].north->y);
+            if (maze[i][j].south != NULL)
+                printf("maze[%d][%d].south = (%d,%d)\n", i, j, maze[i][j].south->x,
+                        maze[i][j].south->y);
+            if (maze[i][j].east != NULL)
+                printf("maze[%d][%d].east = (%d,%d)\n", i, j, maze[i][j].east->x,
+                        maze[i][j].east->y);
+            if (maze[i][j].west != NULL)
+                printf("maze[%d][%d].west = (%d,%d)\n", i, j, maze[i][j].west->x,
+                        maze[i][j].west->y);
+            if (i != WIDTH-1 || j != HEIGHT-1) {
+                printf("\n");
+            }
+        }
+    }
 }
 

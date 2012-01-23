@@ -41,36 +41,10 @@ void connect_maze(struct cell maze[WIDTH][HEIGHT]) {
     }
 }
 
-void print_maze(struct cell maze[WIDTH][HEIGHT]) {
-    int8_t i;
-    int8_t j;
-    for (i = 0; i < WIDTH; i++) {
-        for (j = 0; j < HEIGHT; j++) {
-            printf("maze[%d][%d]\n", i, j);
-            if (maze[i][j].north != NULL)
-                printf("maze[%d][%d].north = (%d,%d)\n", i, j, maze[i][j].north->x,
-                        maze[i][j].north->y);
-            if (maze[i][j].south != NULL)
-                printf("maze[%d][%d].south = (%d,%d)\n", i, j, maze[i][j].south->x,
-                        maze[i][j].south->y);
-            if (maze[i][j].east != NULL)
-                printf("maze[%d][%d].east = (%d,%d)\n", i, j, maze[i][j].east->x,
-                        maze[i][j].east->y);
-            if (maze[i][j].west != NULL)
-                printf("maze[%d][%d].west = (%d,%d)\n", i, j, maze[i][j].west->x,
-                        maze[i][j].west->y);
-            if (i != WIDTH-1 || j != HEIGHT-1) {
-                printf("\n");
-            }
-        }
-    }
-}
-
 int main(int argc, char* argv[]) {
     struct cell maze[WIDTH][HEIGHT];
     initialize_movement(argc, argv);
     init_maze(maze);
     connect_maze(maze);
-//  print_maze(maze);
     return 0;
 }

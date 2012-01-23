@@ -68,45 +68,25 @@ void initialize_movement(int argc, char* argv[]) {
 
     int8_t i = 0;
     int8_t j = 0;
-    int8_t l = 0;
     init_maze(maze);
-    for (l = CHAR_HEIGHT-2; l >= 0; l--) {
+    for (j = 0; j < CHAR_HEIGHT-1; j++) {
         for (k = 1; k < CHAR_WIDTH-1; k+=2) {
-            if (chars[k][l+1] == '_') {
-                maze[i][j].south = NULL;
-            } else if (chars[k][l+1] == ' ') {
-                maze[i][j].south = &(maze[i][j+1]);
-            } else {
-                assert(false && "unknown character in maze");
+            if (chars[k][j+1] == ' ') {
+                maze[i][j].north = &(maze[i][j+1]);
             }
-
-            if (chars[k][l] == '_') {
-                maze[i][j].north = NULL;
-            } else if (chars[k][l] == ' ') {
-                maze[i][j].north = &(maze[i][j-1]);
-            } else {
-                assert(false && "unknown character in maze");
+            if (chars[k][j] == ' ') {
+                maze[i][j].south = &(maze[i][j-1]);
             }
-
-            if (chars[k+1][l] == '|') {
-                maze[i][j].east = NULL;
-            } else if (chars[k+1][l] == ' ') {
+            if (chars[k+1][j] == ' ') {
                 maze[i][j].east = &(maze[i+1][j]);
-            } else {
-                assert(false && "unknown character in maze");
             }
 
-            if (chars[k-1][l] == '|') {
-                maze[i][j].west = NULL;
-            } else if (chars[k-1][l] == ' ') {
+            if (chars[k-1][j] == ' ') {
                 maze[i][j].west = &(maze[i-1][j]);
-            } else {
-                assert(false && "unknown character in maze");
             }
             i++;
         }
         i = 0;
-        j++;
     }
     print_maze(maze);
 }

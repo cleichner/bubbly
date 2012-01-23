@@ -11,7 +11,9 @@
 #define CHAR_WIDTH 2*WIDTH+1
 #define CHAR_HEIGHT HEIGHT+1
 
-static void ignore_trailing_whitespace(FILE* stream);
+static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream);
+static void make_graph(struct cell maze[WIDTH][HEIGHT],
+                       char chars[CHAR_WIDTH][CHAR_HEIGHT]);
 
 static void accept(bool (*accept_f)(char), char* name, char* dest, char cur);
 static bool space(char cur) { return cur == ' ' || cur == '\t'; }
@@ -22,6 +24,7 @@ static bool underscore_or_space(char cur) {
     return underscore(cur) || space(cur);
 }
 static bool pipe_or_space(char cur) { return pipe(cur) || space(cur); }
+static void ignore_trailing_whitespace(FILE* stream);
 
 static struct cell maze[WIDTH][HEIGHT];
 
@@ -35,6 +38,15 @@ void initialize_movement(int argc, char* argv[]) {
     FILE* stream = fopen(argv[1], "r");
     assert(stream && "Maze-file could not be opened for reading.\n");
 
+    parse_maze_file(chars, stream);
+    fclose(stream);
+
+    init_maze(maze);
+    make_graph(maze, chars);
+    print_maze(maze);
+}
+
+static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream) {
     int8_t col = 0;
     int8_t row = HEIGHT;
     int8_t k = 0;
@@ -64,13 +76,16 @@ void initialize_movement(int argc, char* argv[]) {
         accept(pipe, "a pipe", &chars[col][row], fgetc(stream)); col++;
         ignore_trailing_whitespace(stream); col=0; row--;
     }
-    fclose(stream);
+}
 
+static void make_graph(struct cell maze[WIDTH][HEIGHT],
+                       char chars[CHAR_WIDTH][CHAR_HEIGHT]) {
     int8_t i = 0;
     int8_t j = 0;
-    init_maze(maze);
+    int8_t k = 1;
     for (j = 0; j < CHAR_HEIGHT-1; j++) {
         for (k = 1; k < CHAR_WIDTH-1; k+=2) {
+            i = k/2;
             if (chars[k][j+1] == ' ') {
                 maze[i][j].north = &(maze[i][j+1]);
             }
@@ -84,11 +99,8 @@ void initialize_movement(int argc, char* argv[]) {
             if (chars[k-1][j] == ' ') {
                 maze[i][j].west = &(maze[i-1][j]);
             }
-            i++;
         }
-        i = 0;
     }
-    print_maze(maze);
 }
 
 static void accept(bool (*accept_f)(char), char* name, char* dest, char cur) {
@@ -109,3 +121,4 @@ static void ignore_trailing_whitespace(FILE* stream) {
     char _;
     accept(newline, "a newline", &_, cur);
 }
+

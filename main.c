@@ -25,18 +25,14 @@ void connect_maze(struct cell maze[WIDTH][HEIGHT]) {
     int8_t j;
     for (i = 0; i < WIDTH; i++) {
         for (j = 0; j < HEIGHT; j++) {
-            if (j != HEIGHT-1) {
+            if (j != HEIGHT-1)
                 maze[i][j].north = &(maze[i][j+1]);
-            }
-            if (j != 0) {
+            if (j != 0)
                 maze[i][j].south = &(maze[i][j-1]);
-            }
-            if (i != WIDTH-1) {
+            if (i != WIDTH-1)
                 maze[i][j].east = &(maze[i+1][j]);
-            }
-            if (i != 0) {
+            if (i != 0)
                 maze[i][j].west = &(maze[i-1][j]);
-            }
         }
     }
 }

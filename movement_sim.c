@@ -14,7 +14,7 @@
 static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream);
 static void make_graph(struct cell maze[WIDTH][HEIGHT],
                        char chars[CHAR_WIDTH][CHAR_HEIGHT]);
-static void print_maze(struct cell maze[WIDTH][HEIGHT]);
+static void print_edges(struct cell maze[WIDTH][HEIGHT]);
 
 static void accept(bool (*accept_f)(char), char* name, char* dest, char cur);
 static bool space(char cur) { return cur == ' ' || cur == '\t'; }
@@ -44,7 +44,24 @@ void initialize_movement(int argc, char* argv[]) {
 
     init_maze(maze);
     make_graph(maze, chars);
-    print_maze(maze);
+    print_edges(maze);
+}
+
+void move_forward(int8_t n) {
+    assert(false && "move_forward unimplemented");
+}
+
+void rotate_left(void) {
+    assert(false && "rotate_left unimplemented");
+}
+
+void rotate_right(void) {
+    assert(false && "rotate_right unimplemented");
+}
+
+bool has_wall(direction_t direction) {
+    assert(false && "has_wall unimplemented");
+    return false;
 }
 
 static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream) {
@@ -87,19 +104,14 @@ static void make_graph(struct cell maze[WIDTH][HEIGHT],
     for (j = 0; j < CHAR_HEIGHT-1; j++) {
         for (k = 1; k < CHAR_WIDTH-1; k+=2) {
             i = k/2;
-            if (chars[k][j+1] == ' ') {
+            if (chars[k][j+1] == ' ')
                 maze[i][j].north = &(maze[i][j+1]);
-            }
-            if (chars[k][j] == ' ') {
+            if (chars[k][j] == ' ')
                 maze[i][j].south = &(maze[i][j-1]);
-            }
-            if (chars[k+1][j] == ' ') {
+            if (chars[k+1][j] == ' ')
                 maze[i][j].east = &(maze[i+1][j]);
-            }
-
-            if (chars[k-1][j] == ' ') {
+            if (chars[k-1][j] == ' ')
                 maze[i][j].west = &(maze[i-1][j]);
-            }
         }
     }
 }
@@ -123,7 +135,7 @@ static void ignore_trailing_whitespace(FILE* stream) {
     accept(newline, "a newline", &_, cur);
 }
 
-static void print_maze(struct cell maze[WIDTH][HEIGHT]) {
+static void print_edges(struct cell maze[WIDTH][HEIGHT]) {
     int8_t i;
     int8_t j;
     for (i = 0; i < WIDTH; i++) {

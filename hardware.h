@@ -11,8 +11,8 @@ typedef enum {
 } direction_t;
 
 /* Any initialization that needs to happen in the main function. */
-void initialize_movement(int argc, char* argv[]);
-void finalize_movement(void);
+void initialize_hardware(int argc, char* argv[]);
+void finalize_hardware(void);
 
 /* Move n squares forward. */
 void move_forward(int8_t n);

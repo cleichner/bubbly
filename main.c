@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "maze.h"
-#include "movement.h"
+#include "hardware.h"
 
 void init_maze(struct cell maze[WIDTH][HEIGHT]) {
     int8_t i;
@@ -39,7 +39,7 @@ void connect_maze(struct cell maze[WIDTH][HEIGHT]) {
 
 int main(int argc, char* argv[]) {
     struct cell maze[WIDTH][HEIGHT];
-    initialize_movement(argc, argv);
+    initialize_hardware(argc, argv);
     init_maze(maze);
     connect_maze(maze);
 
@@ -54,6 +54,6 @@ int main(int argc, char* argv[]) {
     move_forward(1);
     move_forward(1);
 
-    finalize_movement();
+    finalize_hardware();
     return 0;
 }

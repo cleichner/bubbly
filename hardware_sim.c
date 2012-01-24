@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include "maze.h"
-#include "movement.h"
+#include "hardware.h"
 
 #define CHAR_WIDTH 2*WIDTH+1
 #define CHAR_HEIGHT HEIGHT+1
@@ -34,7 +34,7 @@ static int8_t x_pos = 0;
 static int8_t y_pos = 0;
 static abs_direction current_direction = NORTH;
 
-void initialize_movement(int argc, char* argv[]) {
+void initialize_hardware(int argc, char* argv[]) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s maze-file\n", argv[0]);
         exit(1);
@@ -55,7 +55,7 @@ void initialize_movement(int argc, char* argv[]) {
     display_maze();
 }
 
-void finalize_movement(void) {
+void finalize_hardware(void) {
     endwin();
 }
 
@@ -115,7 +115,7 @@ void rotate_right(void) {
 }
 
 bool has_wall(direction_t direction) {
-    assert(false && direction &&"has_wall unimplemented");
+    assert(false && direction);
     return false;
 }
 

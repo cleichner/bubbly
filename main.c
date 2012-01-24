@@ -42,5 +42,18 @@ int main(int argc, char* argv[]) {
     initialize_movement(argc, argv);
     init_maze(maze);
     connect_maze(maze);
+
+    move_forward(1);
+    move_forward(1);
+    move_forward(1);
+    move_forward(1);
+    rotate_right();
+    move_forward(1);
+    move_forward(1);
+    rotate_right();
+    move_forward(1);
+    move_forward(1);
+
+    finalize_movement();
     return 0;
 }

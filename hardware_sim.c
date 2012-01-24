@@ -15,7 +15,6 @@
 static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream);
 static void make_graph(struct cell maze[WIDTH][HEIGHT],
                        char chars[CHAR_WIDTH][CHAR_HEIGHT]);
-//static void print_edges(struct cell maze[WIDTH][HEIGHT]);
 static void display_maze(void);
 
 static void accept(bool (*accept_f)(char), char* name, char* dest, char cur);
@@ -32,7 +31,8 @@ static void ignore_trailing_whitespace(FILE* stream);
 static struct cell maze[WIDTH][HEIGHT];
 static int8_t x_pos = 0;
 static int8_t y_pos = 0;
-static abs_direction current_direction = NORTH;
+static direction_t current_direction = NORTH;
+
 
 void initialize_hardware(int argc, char* argv[]) {
     if (argc != 2) {
@@ -60,79 +60,90 @@ void finalize_hardware(void) {
 }
 
 void move_forward(int8_t n) {
-    if (current_direction == NORTH) {
-        if (!(y_pos + n >= HEIGHT) && maze[x_pos][y_pos].north)
-            y_pos += n;
-        else
-            assert(false && "y_pos >= HEIGHT or tried to move through a wall");
-    } else if (current_direction == SOUTH) {
-        if (!(y_pos - n < 0) && maze[x_pos][y_pos].south)
-            y_pos -= n;
-        else
-            assert(false && "y_pos < 0 or tried to move through a wall");
-    } else if (current_direction == EAST) {
-        if (!(x_pos + n >= WIDTH) && maze[x_pos][y_pos].east)
-            x_pos += n;
-        else
-            assert(false && "x_pos >= WIDTH or tried to move through a wall");
-    } else if (current_direction == WEST) {
-        if (!(x_pos - n < 0) && maze[x_pos][y_pos].west)
-            x_pos -= n;
-        else
-            assert(false && "x_pos < 0 or tried to move through a wall");
-    } else {
-        assert(false && "Unknown direction");
-    } 
+    if (n == 0) {
+        display_maze();
+        return;
+    }
+
+    int8_t i; 
+    for (i = 0; i < n; i++) {
+        if (current_direction == NORTH) {
+            if (!(y_pos + 1 >= HEIGHT) && maze[x_pos][y_pos].north)
+                y_pos += 1;
+            else
+                assert(false && "y_pos >= HEIGHT or tried to move through a wall");
+        } else if (current_direction == SOUTH) {
+            if (!(y_pos - 1 < 0) && maze[x_pos][y_pos].south)
+                y_pos -= 1;
+            else
+                assert(false && "y_pos < 0 or tried to move through a wall");
+        } else if (current_direction == EAST) {
+            if (!(x_pos + 1 >= WIDTH) && maze[x_pos][y_pos].east)
+                x_pos += 1;
+            else
+                assert(false && "x_pos >= WIDTH or tried to move through a wall");
+        } else if (current_direction == WEST) {
+            if (!(x_pos - 1 < 0) && maze[x_pos][y_pos].west)
+                x_pos -= 1;
+            else
+                assert(false && "x_pos < 0 or tried to move through a wall");
+        } else {
+            assert(false && "Unknown direction");
+        } 
+        display_maze();
+    }
+}
+
+void turn_right(void) {
+    direction_t right[] = {EAST, WEST, SOUTH, NORTH};
+    current_direction = current_direction[right];
     display_maze();
 }
 
-void rotate_left(void) {
-    if (current_direction == NORTH)
-        current_direction = WEST;
-    else if (current_direction == WEST)
-        current_direction = SOUTH;
-    else if (current_direction == SOUTH)
-        current_direction = EAST;
-    else if (current_direction == EAST)
-        current_direction = NORTH;
-    else
-        assert(false && "Unknown direction");
+void turn_left(void) {
+    direction_t left[] = {WEST, EAST, NORTH, SOUTH};
+    current_direction = current_direction[left];
     display_maze();
 }
 
-void rotate_right(void) {
-    if (current_direction == NORTH)
-        current_direction = EAST;
-    else if (current_direction == WEST)
-        current_direction = NORTH;
-    else if (current_direction == SOUTH)
-        current_direction = WEST;
-    else if (current_direction == EAST)
-        current_direction = SOUTH;
-    else
-        assert(false && "Unknown direction");
-    display_maze();
-}
+/* TODO turn this into a table */
+bool has_wall(side_t side) {
+    if (side == FRONT) {
+        if (current_direction == NORTH)
+            return !maze[x_pos][y_pos].north;
+        if (current_direction == SOUTH)
+            return !maze[x_pos][y_pos].south;
+        if (current_direction == EAST)
+            return !maze[x_pos][y_pos].east;
+        if (current_direction == WEST)
+            return !maze[x_pos][y_pos].west;
+    }
+    if (side == LEFT) {
+        if (current_direction == NORTH)
+            return !maze[x_pos][y_pos].west;
+        if (current_direction == SOUTH)
+            return !maze[x_pos][y_pos].east;
+        if (current_direction == EAST)
+            return !maze[x_pos][y_pos].north;
+        if (current_direction == WEST)
+            return !maze[x_pos][y_pos].south;
+    }
+    if (side == RIGHT) {
+        if (current_direction == NORTH)
+            return !maze[x_pos][y_pos].east;
+        if (current_direction == SOUTH)
+            return !maze[x_pos][y_pos].west;
+        if (current_direction == EAST)
+            return !maze[x_pos][y_pos].south;
+        if (current_direction == WEST)
+            return !maze[x_pos][y_pos].north;
+    }
 
-bool has_wall(direction_t direction) {
-    assert(false && direction);
-    return false;
+    assert(false && "unknown side");
+    return true;
 }
 
 static void display_maze(void) { 
-    char pointer;
-    if (current_direction == NORTH) {
-        pointer = '^';
-    } else if (current_direction == SOUTH) {
-        pointer = 'v';
-    } else if (current_direction == EAST) {
-        pointer = '>';
-    } else if (current_direction == WEST) {
-        pointer = '<';
-    } else {
-        assert(false && "Unknown direction");
-    } 
-
     int8_t i = 0;
     int8_t j = 0;
     int8_t k = HEIGHT-1;
@@ -141,16 +152,17 @@ static void display_maze(void) {
         mvprintw(0, 4*j+1, "___ ");
     }   
 
+    char arrow[] = {'^', 'v', '>', '<'};
     for (i = 0; i < HEIGHT; i++) {
         mvprintw(2*i+1, 0, "|");
         mvprintw(2*i+2, 0, "|");
         for (j = 0; j < WIDTH; j++) {
-            mvprintw(2*i+1, 4*j+1, "%c%c%c%c",' ',
-                j == x_pos && k == y_pos ? pointer : ' ' ,' ',
-                maze[j][k].east == NULL ? '|' : ' ');
-            mvprintw(2*i+2, 4*j+1, "%s%c",
-                maze[j][k].south == NULL ? "___" : "   ",
-                maze[j][k].east == NULL ?  '|': ' ');
+            mvprintw(2*i+1, 4*j+1, " %c %c",
+                j == x_pos && k == y_pos ? current_direction[arrow] : ' ' ,
+                maze[j][k].east ? ' ' : '|');
+
+            mvprintw(2*i+2, 4*j+1, "%s%c", maze[j][k].south ? "   " : "___",
+                maze[j][k].east ?  ' ': '|');
         }
         k--;
     }
@@ -230,30 +242,3 @@ static void ignore_trailing_whitespace(FILE* stream) {
     char _;
     accept(newline, "a newline", &_, cur);
 }
-
-#if 0
-static void print_edges(struct cell maze[WIDTH][HEIGHT]) {
-    int8_t i;
-    int8_t j;
-    for (i = 0; i < WIDTH; i++) {
-        for (j = 0; j < HEIGHT; j++) {
-            printf("maze[%d][%d]\n", i, j);
-            if (maze[i][j].north != NULL)
-                printf("maze[%d][%d].north = (%d,%d)\n", i, j, maze[i][j].north->x,
-                        maze[i][j].north->y);
-            if (maze[i][j].south != NULL)
-                printf("maze[%d][%d].south = (%d,%d)\n", i, j, maze[i][j].south->x,
-                        maze[i][j].south->y);
-            if (maze[i][j].east != NULL)
-                printf("maze[%d][%d].east = (%d,%d)\n", i, j, maze[i][j].east->x,
-                        maze[i][j].east->y);
-            if (maze[i][j].west != NULL)
-                printf("maze[%d][%d].west = (%d,%d)\n", i, j, maze[i][j].west->x,
-                        maze[i][j].west->y);
-            if (i != WIDTH-1 || j != HEIGHT-1) {
-                printf("\n");
-            }
-        }
-    }
-}
-#endif

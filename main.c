@@ -43,16 +43,17 @@ int main(int argc, char* argv[]) {
     init_maze(maze);
     connect_maze(maze);
 
-    move_forward(1);
-    move_forward(1);
-    move_forward(1);
-    move_forward(1);
-    rotate_right();
-    move_forward(1);
-    move_forward(1);
-    rotate_right();
-    move_forward(1);
-    move_forward(1);
+    while (!has_wall(FRONT)) {
+        move_forward(1);
+    }
+    int8_t i;
+    for (i = 0; i < 2; i++) {
+        turn_right();
+        move_forward(2);
+    }
+    while (has_wall(FRONT)) {
+        turn_left();
+    }
 
     finalize_hardware();
     return 0;

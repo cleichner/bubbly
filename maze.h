@@ -5,11 +5,11 @@
 #define HEIGHT 5
 
 typedef enum {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST
-} abs_direction;
+    NORTH = 0,
+    SOUTH = 1,
+    EAST = 2,
+    WEST = 3
+} direction_t;
 
 struct cell {
     uint8_t x;

@@ -160,68 +160,31 @@ void find_path(struct action actions[ACTION_SIZE],
     }
     sequence[s] = &maze[source.x][source.y];
 
+    // build the actions to move through the sequence
     for (s = 0; sequence[s] == NULL; s++)
         ; // find the start of the sequence
 
-    // build the actions to move through the sequence
+    // first index is what direction the next square is from where you are
+    // second index is what direction you are facing
+    int16_t (*add_movement_between[4][4])(struct action[ACTION_SIZE],
+                                        int16_t) = {
+        {add_forward, add_backward, add_left, add_right},
+        {add_backward, add_forward, add_right, add_left},
+        {add_right, add_left, add_forward, add_backward},
+        {add_left, add_right, add_backward, add_forward},
+    };
+
     int16_t a = 0;
     direction_t heading = current_direction;
     for (; s < WIDTH*HEIGHT-1; s++) {
         assert(a < ACTION_SIZE && "index out of range for actions");
-        if (sequence[s]->path[NORTH] == sequence[s+1]) {
-            if (heading == NORTH) {
-                a = add_forward(actions, a);
-            } else if (heading == SOUTH) {
-                a = add_backward(actions, a);
-            } else if (heading == EAST) {
-                a = add_left(actions, a);
-            } else if (heading == WEST) {
-                a = add_right(actions, a);
-            } else {
-                assert(false && "unknown heading");
-            }
-            heading = NORTH;
-        } else if (sequence[s]->path[SOUTH] == sequence[s+1]) {
-            if (heading == NORTH) {
-                a = add_backward(actions, a);
-            } else if (heading == SOUTH) {
-                a = add_forward(actions, a);
-            } else if (heading == EAST) {
-                a = add_right(actions, a);
-            } else if (heading == WEST) {
-                a = add_left(actions, a);
-            } else {
-                assert(false && "unknown heading");
-            }
-            heading = SOUTH;
-        } else if (sequence[s]->path[EAST] == sequence[s+1]) {
-            if (heading == NORTH) {
-                a = add_right(actions, a);
-            } else if (heading == SOUTH) {
-                a = add_left(actions, a);
-            } else if (heading == EAST) {
-                a = add_forward(actions, a);
-            } else if (heading == WEST) {
-                a = add_backward(actions, a);
-            } else {
-                assert(false && "unknown heading");
-            }
-            heading = EAST;
-        } else if (sequence[s]->path[WEST] == sequence[s+1]) {
-             if (heading == NORTH) {
-                a = add_left(actions, a);
-            } else if (heading == SOUTH) {
-                a = add_right(actions, a);
-            } else if (heading == EAST) {
-                a = add_backward(actions, a);
-            } else if (heading == WEST) {
-                a = add_forward(actions, a);
-            } else {
-                assert(false && "unknown heading");
-            }           heading = WEST;
-        } else {
-            assert(false && "path not found");
-        }
+        direction_t path_dir;
+        for (path_dir = NORTH; path_dir <= WEST; path_dir++)
+            if (sequence[s]->path[path_dir] == sequence[s+1])
+                break;
+
+        a = add_movement_between[path_dir][heading](actions, a);
+        heading = path_dir;
         a++;
     }
 

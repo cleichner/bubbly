@@ -70,6 +70,61 @@ bool all(bool visited[WIDTH][HEIGHT]) {
     return true;
 }
 
+// inputs: maze, source, target
+// output: sequence
+void dijkstra(struct cell maze[WIDTH][HEIGHT], 
+              struct point source, struct point target,
+              struct cell* sequence[WIDTH*HEIGHT]) {
+    int8_t dist[WIDTH][HEIGHT];
+    struct cell* previous[WIDTH][HEIGHT];
+    bool visited[WIDTH][HEIGHT];
+    int8_t i, j;
+    for (i = 0; i < WIDTH; i++) {
+        for (j = 0; j < HEIGHT; j++) {
+            dist[i][j] = inf; // Unknown distance from source to [i][j]
+            previous[i][j] = NULL; // previous node in optimal path from source
+            visited[i][j] = false;
+        }
+    }  
+
+    // build previous table
+    dist[source.x][source.y] = 0;
+    while (!all(visited)) {
+        struct cell* u = min_cell(maze, dist, visited);
+        visited[u->x][u->y] = true;
+        if (dist[u->x][u->y] == inf)
+            break;
+
+        if (target.x == u->x && target.y == u->y) // we found the target!
+            break;
+
+        // go over all neighbors
+        for (i = 0; i < 4; i++) {
+            struct cell* v = u->path[i];
+            if (v == NULL) // v isn't an edge
+                continue;
+            if (visited[v->x][v->y]) // skip visited
+                continue;
+            int8_t alt = dist[u->x][u->y] + 1; // distance between u and v
+            if (alt < dist[v->x][v->y]) {
+                dist[v->x][v->y] = alt;
+                previous[v->x][v->y] = u;
+            }
+        }
+    }
+
+    // map sequence
+    struct cell* u = &maze[target.x][target.y];
+    int16_t s = WIDTH*HEIGHT-1;
+    while (previous[u->x][u->y]) {
+        assert(s >= 0 && "index out of range for sequence");
+        sequence[s] = u; // fill the sequence from the back
+        u = previous[u->x][u->y];
+        s--;
+    }
+    sequence[s] = &maze[source.x][source.y];
+}
+
 int16_t add_backward(struct action actions[ACTION_SIZE], int16_t a) {
     actions[a].move = turn_right;
     actions[a].times = 1;
@@ -110,57 +165,11 @@ void find_path(struct action actions[ACTION_SIZE],
                struct cell maze[WIDTH][HEIGHT],
                struct point source,
                struct point target) {
-    // Dijkstra's algorithm
-    int8_t dist[WIDTH][HEIGHT];
-    struct cell* previous[WIDTH][HEIGHT];
-    bool visited[WIDTH][HEIGHT];
-
-    int8_t i, j;
-    for (i = 0; i < WIDTH; i++) {
-        for (j = 0; j < HEIGHT; j++) {
-            dist[i][j] = inf; // Unknown distance from source to [i][j]
-            previous[i][j] = NULL; // previous node in optimal path from source
-            visited[i][j] = false;
-        }
-    }  
-
-    dist[source.x][source.y] = 0;
-    while (!all(visited)) {
-        struct cell* u = min_cell(maze, dist, visited);
-        visited[u->x][u->y] = true;
-        if (dist[u->x][u->y] == inf)
-            break;
-
-        if (target.x == u->x && target.y == u->y) // we found the target!
-            break;
-
-        // go over all neighbors
-        for (i = 0; i < 4; i++) {
-            struct cell* v = u->path[i];
-            if (v == NULL) // v isn't an edge
-                continue;
-            if (visited[v->x][v->y]) // skip visited
-                continue;
-            int8_t alt = dist[u->x][u->y] + 1; // distance between u and v
-            if (alt < dist[v->x][v->y]) {
-                dist[v->x][v->y] = alt;
-                previous[v->x][v->y] = u;
-            }
-        }
-    }
-
     struct cell* sequence[WIDTH*HEIGHT] = {0};
-    struct cell* u = &maze[target.x][target.y];
-    int16_t s = WIDTH*HEIGHT-1;
-    while (previous[u->x][u->y]) {
-        assert(s >= 0 && "index out of range for sequence");
-        sequence[s] = u; // fill the sequence from the back
-        u = previous[u->x][u->y];
-        s--;
-    }
-    sequence[s] = &maze[source.x][source.y];
+    dijkstra(maze, source, target, sequence);
 
     // build the actions to move through the sequence
+    int16_t s;
     for (s = 0; sequence[s] == NULL; s++)
         ; // find the start of the sequence
 
@@ -188,7 +197,7 @@ void find_path(struct action actions[ACTION_SIZE],
         a++;
     }
 
-    // nop out the rest of the  actions
+    // nop out the rest of the actions
     for (; a < ACTION_SIZE; a++)
         actions[a] = nop;
 }

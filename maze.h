@@ -17,7 +17,7 @@ typedef enum {
 struct cell {
     uint8_t x;
     uint8_t y;
-    struct cell* path[4]; /* NORTH, SOUTH, EAST, WEST */
+    struct cell* path[4]; // NORTH, SOUTH, EAST, WEST
     bool visited;
 };
 
@@ -33,4 +33,4 @@ struct action {
 
 void init_maze(struct cell maze[WIDTH][HEIGHT]);
 
-#endif /* MAZE_H */
+#endif // MAZE_H

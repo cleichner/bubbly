@@ -5,4 +5,4 @@ void display_maze(struct cell maze[WIDTH][HEIGHT],
                   struct point pos, direction_t current_direction);
 void init_display(void);
 void finalize_display(void);
-#endif
+#endif // DISPLAY_H

@@ -57,7 +57,6 @@ void initialize_hardware(int argc, char* argv[]) {
     action.sa_flags = 0;
     sigaction(SIGINT, &action, NULL);
 
-
     init_maze(maze);
     make_graph(maze, chars);
 
@@ -78,25 +77,21 @@ void move_forward(int8_t n) {
     int8_t i; 
     for (i = 0; i < n; i++) {
         if (current_direction == NORTH) {
-            if (!(pos.y + 1 >= HEIGHT) && maze[pos.x][pos.y].path[NORTH])
-                pos.y += 1;
-            else
-                assert(false && "pos.y >= HEIGHT or tried to move through a wall");
+            assert(!(pos.y + 1 >= HEIGHT) && maze[pos.x][pos.y].path[NORTH] && 
+                   "pos.y >= HEIGHT or tried to move through a wall");
+            pos.y += 1;
         } else if (current_direction == SOUTH) {
-            if (!(pos.y - 1 < 0) && maze[pos.x][pos.y].path[SOUTH])
-                pos.y -= 1;
-            else
-                assert(false && "pos.y < 0 or tried to move through a wall");
+            assert(!(pos.y - 1 < 0) && maze[pos.x][pos.y].path[SOUTH] &&
+                   "pos.y < 0 or tried to move through a wall");
+            pos.y -= 1;
         } else if (current_direction == EAST) {
-            if (!(pos.x + 1 >= WIDTH) && maze[pos.x][pos.y].path[EAST])
-                pos.x += 1;
-            else
-                assert(false && "pos.x >= WIDTH or tried to move through a wall");
+            assert(!(pos.x + 1 >= WIDTH) && maze[pos.x][pos.y].path[EAST] &&
+                   "pos.x >= WIDTH or tried to move through a wall");
+            pos.x += 1;
         } else if (current_direction == WEST) {
-            if (!(pos.x - 1 < 0) && maze[pos.x][pos.y].path[WEST])
-                pos.x -= 1;
-            else
-                assert(false && "pos.x < 0 or tried to move through a wall");
+            assert(!(pos.x - 1 < 0) && maze[pos.x][pos.y].path[WEST] &&
+                   "pos.x < 0 or tried to move through a wall");
+            pos.x -= 1;
         } else {
             assert(false && "Unknown direction");
         } 
@@ -135,7 +130,7 @@ static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream) {
     int8_t row = HEIGHT;
     int8_t k = 0;
 
-    /* parse top line */
+    // parse top line
     accept(space, "a space", &chars[col][row], fgetc(stream)); col++;
     for (k = 0; k < WIDTH-1; k++) {
         accept(underscore, "an underscore", &chars[col][row], fgetc(stream));
@@ -145,7 +140,7 @@ static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream) {
     accept(underscore, "an underscore", &chars[col][row], fgetc(stream)); col++;
     ignore_trailing_whitespace(stream);  col=0; row--;
 
-    /* parse body */
+    // parse body
     for (k = 0; k < HEIGHT; k++) {
         accept(pipe_char, "a pipe_char", &chars[col][row], fgetc(stream)); col++;
         int8_t l = 0;

@@ -161,13 +161,8 @@ int16_t add_right(struct action actions[ACTION_SIZE], int16_t a) {
     return a;
 }
 
-void find_path(struct action actions[ACTION_SIZE],
-               struct cell maze[WIDTH][HEIGHT],
-               struct point source,
-               struct point target) {
-    struct cell* sequence[WIDTH*HEIGHT] = {0};
-    dijkstra(maze, source, target, sequence);
-
+void build_actions(struct cell* sequence[WIDTH*HEIGHT],
+                   struct action actions[ACTION_SIZE]) {
     // build the actions to move through the sequence
     int16_t s;
     for (s = 0; sequence[s] == NULL; s++)
@@ -200,6 +195,15 @@ void find_path(struct action actions[ACTION_SIZE],
     // nop out the rest of the actions
     for (; a < ACTION_SIZE; a++)
         actions[a] = nop;
+}
+
+void find_path(struct action actions[ACTION_SIZE],
+               struct cell maze[WIDTH][HEIGHT],
+               struct point source,
+               struct point target) {
+    struct cell* sequence[WIDTH*HEIGHT] = {0};
+    dijkstra(maze, source, target, sequence);
+    build_actions(sequence, actions);
 }
 
 

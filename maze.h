@@ -1,6 +1,9 @@
 #ifndef MAZE_H
 #define MAZE_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #define WIDTH 5
 #define HEIGHT 5
 
@@ -14,10 +17,18 @@ typedef enum {
 struct cell {
     uint8_t x;
     uint8_t y;
-    struct cell* north;
-    struct cell* south;
-    struct cell* east;
-    struct cell* west;
+    struct cell* path[4]; /* NORTH, SOUTH, EAST, WEST */
+    bool visited;
+};
+
+struct point {
+    int8_t x;
+    int8_t y;
+};
+
+struct action {
+    void (*move)(int8_t n);
+    int8_t times;
 };
 
 void init_maze(struct cell maze[WIDTH][HEIGHT]);

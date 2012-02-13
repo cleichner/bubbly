@@ -19,11 +19,11 @@ void finalize_hardware(void);
 /* Move n squares forward. */
 void move_forward(int8_t n);
 
-/* Rotate 90 degrees counter-clockwise. */
-void turn_left(void);
+/* Rotate 90 degrees counter-clockwise n times. */
+void turn_left(int8_t n);
 
-/* Rotate 90 degrees clockwise. */
-void turn_right(void);
+/* Rotate 90 degrees clockwise n times. */
+void turn_right(int8_t n);
 
 /* Returns true if there is currently a wall in the specified direction with
  * respect to the robot. */

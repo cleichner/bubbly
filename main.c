@@ -5,7 +5,7 @@
 
 #include "maze.h"
 #include "hardware.h"
-#define ACTION_SIZE 2*WIDTH*HEIGHT
+#define ACTION_SIZE 3*WIDTH*HEIGHT
 static int8_t inf = INT8_MAX;
 static struct action nop = { .move = turn_right, .times = 0 };
 static direction_t current_direction = NORTH;
@@ -217,7 +217,7 @@ void find_path(struct action actions[ACTION_SIZE],
 }
 
 void init_actions(struct action actions[ACTION_SIZE]) {
-    int8_t i;
+    int16_t i;
     for (i = 0; i < ACTION_SIZE; i++) {
         actions[i] = nop;
     }
@@ -227,8 +227,8 @@ bool safe_execute_actions(struct cell maze[WIDTH][HEIGHT],
                           struct action actions[ACTION_SIZE]) {
     direction_t left[] = {WEST, EAST, NORTH, SOUTH};
     direction_t right[] = {EAST, WEST, SOUTH, NORTH};
-    int8_t i;
-    int8_t j;
+    int16_t i;
+    int16_t j;
     for (i = 0; i < ACTION_SIZE; i++) {
         for (j = 0; j < actions[i].times; j++) {
             if (actions[i].move == nop.move && actions[i].times == nop.times) {

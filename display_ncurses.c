@@ -38,5 +38,5 @@ void display_maze(struct cell maze[WIDTH][HEIGHT],
     mvprintw(2*HEIGHT+1, 0, "\n");
 
     refresh();
-    usleep(250000);
+    usleep(50000);
 }

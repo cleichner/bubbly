@@ -80,13 +80,11 @@ bool all(bool visited[WIDTH][HEIGHT]) {
     return true;
 }
 
-// inputs: maze, source, target
-// output: sequence
-void dijkstra(struct cell maze[WIDTH][HEIGHT], 
-              struct point source, struct point target,
-              struct cell* sequence[WIDTH*HEIGHT]) {
-    int8_t dist[WIDTH][HEIGHT];
-    struct cell* previous[WIDTH][HEIGHT];
+void shortest_paths(struct cell maze[WIDTH][HEIGHT], 
+              struct point source,
+              int8_t dist[WIDTH][HEIGHT], 
+              struct cell* previous[WIDTH][HEIGHT]) {
+    // Dijkstra's Algorithm
     bool visited[WIDTH][HEIGHT];
     int8_t i, j;
     for (i = 0; i < WIDTH; i++) {
@@ -105,9 +103,6 @@ void dijkstra(struct cell maze[WIDTH][HEIGHT],
         if (dist[u->x][u->y] == inf)
             break;
 
-        if (target.x == u->x && target.y == u->y) // we found the target!
-            break;
-
         // go over all neighbors
         for (i = 0; i < 4; i++) {
             struct cell* v = u->path[i];
@@ -122,8 +117,12 @@ void dijkstra(struct cell maze[WIDTH][HEIGHT],
             }
         }
     }
+}
 
-    // map sequence
+void build_sequence(struct cell maze[WIDTH][HEIGHT],
+        struct point source, struct point target,
+        struct cell* previous[WIDTH][HEIGHT],
+        struct cell* sequence[WIDTH*HEIGHT]) {
     struct cell* u = &maze[target.x][target.y];
     int16_t s = WIDTH*HEIGHT-1;
     while (previous[u->x][u->y]) {
@@ -211,8 +210,12 @@ void find_path(struct action actions[ACTION_SIZE],
                struct cell maze[WIDTH][HEIGHT],
                struct point source,
                struct point target) {
+    int8_t dist[WIDTH][HEIGHT];
+    struct cell* previous[WIDTH][HEIGHT];
+    shortest_paths(maze, source, dist, previous);
+
     struct cell* sequence[WIDTH*HEIGHT] = {0};
-    dijkstra(maze, source, target, sequence);
+    build_sequence(maze, source, target, previous, sequence);
     build_actions(sequence, actions);
 }
 
@@ -293,11 +296,16 @@ bool has_not_visted(struct cell maze[WIDTH][HEIGHT]) {
 struct point not_visited_in(struct cell maze[WIDTH][HEIGHT]) {
     int8_t i,j;
     struct point pos = {.x = 0, .y = 0};
+    int16_t min = INT16_MAX;
+    int8_t dist[WIDTH][HEIGHT];
+    struct cell* previous[WIDTH][HEIGHT];
+    shortest_paths(maze, position, dist, previous);
     for (i = 0; i < WIDTH; i++) {
         for (j = 0; j < HEIGHT; j++) {
-            if (!maze[i][j].visited) {
-                pos.x = maze[i][j].x;
-                pos.y = maze[i][j].y;
+            if (!maze[i][j].visited && dist[i][j] < min) {
+                pos.x = i;
+                pos.y = j;
+                min = dist[i][j];
             }
         }
     }

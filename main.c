@@ -9,6 +9,7 @@
 static int8_t inf = INT8_MAX;
 static struct action nop = { .move = turn_right, .times = 0 };
 static direction_t current_direction = NORTH;
+static struct point position;
 
 void init_maze(struct cell maze[WIDTH][HEIGHT]) {
     int8_t i;
@@ -40,6 +41,15 @@ void connect_maze(struct cell maze[WIDTH][HEIGHT]) {
                 maze[i][j].path[WEST] = &(maze[i-1][j]);
         }
     }
+}
+
+void add_wall(struct cell maze[WIDTH][HEIGHT], int8_t x, int8_t y,
+              direction_t dir) {
+    direction_t opposite[] = {SOUTH, NORTH, WEST, EAST};
+    int8_t pair_x = maze[x][y].path[dir]->x;
+    int8_t pair_y = maze[x][y].path[dir]->y;
+    maze[x][y].path[dir] = NULL;
+    maze[pair_x][pair_y].path[opposite[dir]] = NULL;
 }
 
 struct cell* min_cell(struct cell maze[WIDTH][HEIGHT],
@@ -171,7 +181,7 @@ void build_actions(struct cell* sequence[WIDTH*HEIGHT],
     // first index is what direction the next square is from where you are
     // second index is what direction you are facing
     int16_t (*add_movement_between[4][4])(struct action[ACTION_SIZE],
-                                        int16_t) = {
+                                          int16_t) = {
         {add_forward, add_backward, add_left, add_right},
         {add_backward, add_forward, add_right, add_left},
         {add_right, add_left, add_forward, add_backward},
@@ -206,7 +216,6 @@ void find_path(struct action actions[ACTION_SIZE],
     build_actions(sequence, actions);
 }
 
-
 void init_actions(struct action actions[ACTION_SIZE]) {
     int8_t i;
     for (i = 0; i < ACTION_SIZE; i++) {
@@ -214,21 +223,89 @@ void init_actions(struct action actions[ACTION_SIZE]) {
     }
 }
 
-void execute_actions(struct action actions[ACTION_SIZE],
-                     struct point* position) {
-    // needs to update what we know about the current robot state
-    // needs to check our assumptions about which walls exist
-    // need a fast execute and cautious execute
+bool safe_execute_actions(struct cell maze[WIDTH][HEIGHT],
+                          struct action actions[ACTION_SIZE]) {
+    direction_t left[] = {WEST, EAST, NORTH, SOUTH};
+    direction_t right[] = {EAST, WEST, SOUTH, NORTH};
     int8_t i;
+    int8_t j;
     for (i = 0; i < ACTION_SIZE; i++) {
-        actions[i].move(actions[i].times);
+        for (j = 0; j < actions[i].times; j++) {
+            if (actions[i].move == nop.move && actions[i].times == nop.times) {
+                break;
+            } else if (actions[i].move == move_forward) {
+                if (current_direction == NORTH) {
+                    position.y += 1;
+                } else if (current_direction == SOUTH) {
+                    position.y -= 1;
+                } else if (current_direction == EAST) {
+                    position.x += 1;
+                } else if (current_direction == WEST) {
+                    position.x -= 1;
+                } else {
+                    assert(false && "Unknown direction");
+                } 
+            } else if (actions[i].move == turn_left) {
+                current_direction = current_direction[left];
+            } else if (actions[i].move == turn_right) {
+                current_direction = current_direction[right];
+            } else {
+                assert(false && "Unknown action");
+            }
+            actions[i].move(1);
+            uint8_t x = position.x;
+            uint8_t y = position.y;
+            maze[x][y].visited = true;
+            direction_t front = current_direction;
+            direction_t left_side = current_direction[left];
+            direction_t right_side = current_direction[right];
+            // correct our path
+            if (maze[x][y].path[front] && has_wall(FRONT)) {
+                add_wall(maze, x, y, front);
+                return false;
+            }
+            if (maze[x][y].path[left_side] && has_wall(LEFT)) {
+                add_wall(maze, x, y, left_side);
+                return false;
+            }
+            if (maze[x][y].path[right_side] && has_wall(RIGHT)) {
+                add_wall(maze, x, y, right_side);
+                return false;
+            }
+        }
     }
-    position->x = 1; // totally wrong but makes the compiler happy
+    return true;
+}
+
+bool has_not_visted(struct cell maze[WIDTH][HEIGHT]) {
+    int8_t i,j;
+    for (i = 0; i < WIDTH; i++)
+        for (j = 0; j < HEIGHT; j++)
+            if (!maze[i][j].visited)
+                return true;
+    return false;
+}
+
+struct point not_visited_in(struct cell maze[WIDTH][HEIGHT]) {
+    int8_t i,j;
+    struct point pos = {.x = 0, .y = 0};
+    for (i = 0; i < WIDTH; i++) {
+        for (j = 0; j < HEIGHT; j++) {
+            if (!maze[i][j].visited) {
+                pos.x = maze[i][j].x;
+                pos.y = maze[i][j].y;
+                return pos;
+            }
+        }
+    }
+    assert(false && "all points visited");
+    return pos;
 }
 
 int main(int argc, char* argv[]) {
     struct point goal = {.x = WIDTH/2, .y = HEIGHT/2};
-    struct point position = {.x = 0, .y = 0};
+    struct point start = {.x = 0, .y = 0};
+    position = start;
     
     struct cell maze[WIDTH][HEIGHT];
     initialize_hardware(argc, argv);
@@ -236,8 +313,33 @@ int main(int argc, char* argv[]) {
     connect_maze(maze);
     struct action actions[ACTION_SIZE];
     init_actions(actions);
-    find_path(actions, maze, position, goal);
-    execute_actions(actions, &position);
+    maze[start.x][start.y].visited = true;
+
+    // find the center
+    do {
+        find_path(actions, maze, position, goal);
+    } while (!safe_execute_actions(maze, actions));
+
+    while (has_not_visted(maze)) {
+        do {
+            find_path(actions, maze, position, not_visited_in(maze));
+        } while (!safe_execute_actions(maze, actions));
+    }
+
+    // go back to the start
+    do {
+        find_path(actions, maze, position, start);
+    } while (!safe_execute_actions(maze, actions));
+
+    // find the center
+    do {
+        find_path(actions, maze, position, goal);
+    } while (!safe_execute_actions(maze, actions));
+    
+    // go back to the start
+    do {
+        find_path(actions, maze, position, start);
+    } while (!safe_execute_actions(maze, actions));
 
     // find center
     //   make dijkstra path to goal

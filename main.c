@@ -260,16 +260,20 @@ bool safe_execute_actions(struct cell maze[WIDTH][HEIGHT],
             direction_t left_side = current_direction[left];
             direction_t right_side = current_direction[right];
             // correct our path
+            bool corrected = false;
             if (maze[x][y].path[front] && has_wall(FRONT)) {
                 add_wall(maze, x, y, front);
-                return false;
+                corrected = true;
             }
             if (maze[x][y].path[left_side] && has_wall(LEFT)) {
                 add_wall(maze, x, y, left_side);
-                return false;
+                corrected = true;
             }
             if (maze[x][y].path[right_side] && has_wall(RIGHT)) {
                 add_wall(maze, x, y, right_side);
+                corrected = true;
+            }
+            if (corrected) {
                 return false;
             }
         }
@@ -294,11 +298,9 @@ struct point not_visited_in(struct cell maze[WIDTH][HEIGHT]) {
             if (!maze[i][j].visited) {
                 pos.x = maze[i][j].x;
                 pos.y = maze[i][j].y;
-                return pos;
             }
         }
     }
-    assert(false && "all points visited");
     return pos;
 }
 
@@ -320,6 +322,7 @@ int main(int argc, char* argv[]) {
         find_path(actions, maze, position, goal);
     } while (!safe_execute_actions(maze, actions));
 
+    // map the maze
     while (has_not_visted(maze)) {
         do {
             find_path(actions, maze, position, not_visited_in(maze));
@@ -332,6 +335,8 @@ int main(int argc, char* argv[]) {
     } while (!safe_execute_actions(maze, actions));
 
     // find the center
+    // optimize the path, not implemented 
+    // run it as fast as possible, not implemented
     do {
         find_path(actions, maze, position, goal);
     } while (!safe_execute_actions(maze, actions));
@@ -340,19 +345,6 @@ int main(int argc, char* argv[]) {
     do {
         find_path(actions, maze, position, start);
     } while (!safe_execute_actions(maze, actions));
-
-    // find center
-    //   make dijkstra path to goal
-    //   take one step forward
-    //   if there are any walls you don't know about, update the maze
-    //      make dijkstra path to goal
-    //
-    // map the whole maze
-    //   depth first search to all points not previously visited
-    // return to the start
-    // generate a path to the center
-    // optimize the path
-    // run it as fast as possible
 
     finalize_hardware();
     return 0;

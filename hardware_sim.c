@@ -59,6 +59,7 @@ void initialize_hardware(int argc, char* argv[]) {
 
     init_maze(maze);
     make_graph(maze, chars);
+    maze[pos.x][pos.y].visited = true;
 
     init_display();
     display_maze(maze, pos, current_direction);

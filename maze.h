@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define WIDTH 16
-#define HEIGHT 16
+#define WIDTH 8
+#define HEIGHT 8
 
 typedef enum {
     NORTH = 0,

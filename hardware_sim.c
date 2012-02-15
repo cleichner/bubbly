@@ -95,6 +95,7 @@ void move_forward(int8_t n) {
         } else {
             assert(false && "Unknown direction");
         } 
+        maze[pos.x][pos.y].visited = true;
         display_maze(maze, pos, current_direction);
     }
 }

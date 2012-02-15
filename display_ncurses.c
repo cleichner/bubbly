@@ -26,6 +26,11 @@ void display_maze(struct cell maze[WIDTH][HEIGHT],
         mvprintw(2*i+1, 0, "|");
         mvprintw(2*i+2, 0, "|");
         for (j = 0; j < WIDTH; j++) {
+            if (maze[j][k].visited)
+                attron(A_STANDOUT);
+            else 
+                attroff(A_STANDOUT);
+
             mvprintw(2*i+1, 4*j+1, " %c %c",
                 j == pos.x && k == pos.y ? current_direction[arrow] : ' ' ,
                 maze[j][k].path[EAST] ? ' ' : '|');
@@ -38,5 +43,5 @@ void display_maze(struct cell maze[WIDTH][HEIGHT],
     mvprintw(2*HEIGHT+1, 0, "\n");
 
     refresh();
-    usleep(50000);
+    usleep(150000);
 }

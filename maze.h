@@ -6,6 +6,7 @@
 
 #define WIDTH 16
 #define HEIGHT 16
+#define ACTION_SIZE 3*WIDTH*HEIGHT
 
 typedef enum {
     NORTH = 0,

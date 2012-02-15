@@ -12,7 +12,7 @@ void finalize_display(void) {
 }
 
 void display_maze(struct cell maze[WIDTH][HEIGHT], 
-                  struct point pos, direction_t current_direction) {
+                  struct point pos, direction_t current_direction, bool fast) {
     char dir_string[4][6] = {"North", "South", "East ", "West "};
     printf("(%d, %d) facing %s connected to ", pos.x, pos.y,
            dir_string[current_direction]);
@@ -28,6 +28,9 @@ void display_maze(struct cell maze[WIDTH][HEIGHT],
     if (maze[pos.x][pos.y].path[WEST])
         printf("| (%d, %d) to the West  ", maze[pos.x][pos.y].path[WEST]->x, 
                maze[pos.x][pos.y].path[WEST]->y);
-    printf("|\n");
+    printf("|");
+    if (fast)
+        printf(" fast");
+    printf("\n");
 }
 

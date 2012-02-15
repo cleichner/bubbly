@@ -5,7 +5,6 @@
 
 #include "maze.h"
 #include "hardware.h"
-#define ACTION_SIZE 3*WIDTH*HEIGHT
 static int8_t inf = INT8_MAX;
 static struct action nop = { .move = turn_right, .times = 0 };
 static direction_t current_direction = NORTH;
@@ -234,9 +233,7 @@ bool safe_execute_actions(struct cell maze[WIDTH][HEIGHT],
     int16_t j;
     for (i = 0; i < ACTION_SIZE; i++) {
         for (j = 0; j < actions[i].times; j++) {
-            if (actions[i].move == nop.move && actions[i].times == nop.times) {
-                break;
-            } else if (actions[i].move == move_forward) {
+            if (actions[i].move == move_forward) {
                 if (current_direction == NORTH) {
                     position.y += 1;
                 } else if (current_direction == SOUTH) {
@@ -345,14 +342,13 @@ int main(int argc, char* argv[]) {
     // find the center
     // optimize the path, not implemented 
     // run it as fast as possible, not implemented
-    do {
-        find_path(actions, maze, position, goal);
-    } while (!safe_execute_actions(maze, actions));
-    
-    // go back to the start
-    do {
-        find_path(actions, maze, position, start);
-    } while (!safe_execute_actions(maze, actions));
+    find_path(actions, maze, position, goal);
+    current_direction = fast_execute_actions(actions);
+    position = goal;
+
+    find_path(actions, maze, position, start);
+    current_direction = fast_execute_actions(actions);
+    position = start;
 
     finalize_hardware();
     return 0;

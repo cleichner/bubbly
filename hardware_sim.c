@@ -30,6 +30,7 @@ static void ignore_trailing_whitespace(FILE* stream);
 static struct cell maze[WIDTH][HEIGHT];
 static struct point pos = {.x = 0,  .y = 0};
 static direction_t current_direction = NORTH;
+static bool fast = false;
 
 void handler(int sig) {
     if (sig == SIGINT) {
@@ -62,7 +63,7 @@ void initialize_hardware(int argc, char* argv[]) {
     maze[pos.x][pos.y].visited = true;
 
     init_display();
-    display_maze(maze, pos, current_direction);
+    display_maze(maze, pos, current_direction, fast);
 }
 
 void finalize_hardware(void) {
@@ -71,7 +72,7 @@ void finalize_hardware(void) {
 
 void move_forward(int8_t n) {
     if (n == 0) {
-        display_maze(maze, pos, current_direction);
+        display_maze(maze, pos, current_direction, fast);
         return;
     }
 
@@ -97,7 +98,7 @@ void move_forward(int8_t n) {
             assert(false && "Unknown direction");
         } 
         maze[pos.x][pos.y].visited = true;
-        display_maze(maze, pos, current_direction);
+        display_maze(maze, pos, current_direction, fast);
     }
 }
 
@@ -106,7 +107,7 @@ void turn_right(int8_t n) {
     int8_t i = 0;
     for (i = 0; i < n; i++) {
         current_direction = current_direction[right];
-        display_maze(maze, pos, current_direction);
+        display_maze(maze, pos, current_direction, fast);
     }
 }
 
@@ -115,7 +116,7 @@ void turn_left(int8_t n) {
     int8_t i = 0;
     for (i = 0; i < n; i++) {
         current_direction = current_direction[left];
-        display_maze(maze, pos, current_direction);
+        display_maze(maze, pos, current_direction, fast);
     }
 }
 
@@ -125,6 +126,16 @@ bool has_wall(side_t side) {
                                  {EAST, WEST, SOUTH, NORTH}};
     direction_t abs_side = absolute[side][current_direction];
     return !maze[pos.x][pos.y].path[abs_side];
+}
+
+direction_t fast_execute_actions(struct action actions[ACTION_SIZE]) {
+    int16_t i;
+    fast = true;
+    for (i = 0; i < ACTION_SIZE; i++) {
+        actions[i].move(actions[i].times);
+    }
+    fast = false;
+    return current_direction;
 }
 
 static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream) {

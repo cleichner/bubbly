@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "maze.h"
+
 typedef enum {
     FRONT = 0,
     LEFT = 1,
@@ -28,5 +30,7 @@ void turn_right(int8_t n);
 // Returns true if there is currently a wall in the specified direction with
 // respect to the robot.
 bool has_wall(side_t side);
+
+direction_t fast_execute_actions(struct action actions[ACTION_SIZE]);
 
 #endif // HARDWARE_H

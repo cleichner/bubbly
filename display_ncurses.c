@@ -10,10 +10,12 @@ void init_display(void) {
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK);
 }
+
 void finalize_display(void) {
     sleep(2);
     endwin();
 }
+
 void display_maze(struct cell maze[WIDTH][HEIGHT], 
                   struct point pos, direction_t current_direction,
                   bool fast) {

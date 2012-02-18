@@ -128,14 +128,13 @@ bool has_wall(side_t side) {
     return !maze[pos.x][pos.y].path[abs_side];
 }
 
-direction_t fast_execute_actions(struct action actions[ACTION_SIZE]) {
+void fast_execute_actions(struct action actions[ACTION_SIZE]) {
     int16_t i;
-    fast = true;
+    fast = true; // turn on fast-path highlighting
     for (i = 0; i < ACTION_SIZE; i++) {
         actions[i].move(actions[i].times);
     }
     fast = false;
-    return current_direction;
 }
 
 static void parse_maze_file(char chars[CHAR_WIDTH][CHAR_HEIGHT], FILE* stream) {

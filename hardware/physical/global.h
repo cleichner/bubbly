@@ -11,6 +11,7 @@
 
 #include <avr/io.h>
 
+
 //Left Motor
 #define PinD0 0x01 //A
 #define PinD1 0x02 //B
@@ -19,23 +20,21 @@
 #define PinD5 0x10 //A 
 #define PinD6 0x20 //B 
 
-//****************
-//Global Variables
-//****************
+volatile uint8_t left_current_A;
+volatile uint8_t left_current_B;
+volatile uint8_t left_past_A;
+volatile uint8_t left_past_B;
 
-//ALL ENCODER DATA IS STORED IN ONE BYTE
-//Data Stored as the following
-//-R-|-L-
-//--AB--AB  Current
-//AB--AB--  Past
-volatile uint8_t current_state;
+volatile uint8_t right_current_A;
+volatile uint8_t right_current_B;
+volatile uint8_t right_past_A;
+volatile uint8_t right_past_B;
 
-//These variables will count how many times the motors have turned
-volatile uint64_t r_state;
-volatile uint64_t l_state;
+volatile uint8_t right_turns;
+volatile uint8_t left_turns;
 
-//Encoder Update Flag
 volatile uint8_t EUF;
+
 
 
 #endif

@@ -113,9 +113,8 @@ clean_list :
 	$(REMOVE) $(SRC:.c=.i)
 	$(REMOVEDIR) .dep
 
-
 simulation:
-	$(CC) $(CFLAGS) -c -Ihardware -I. -lcurses hardware/simulated/display_ncurses.c 
+	$(CC) $(CFLAGS) -c -Ihardware -I. hardware/simulated/display_ncurses.c 
 	$(CC) $(CFLAGS) -c -Ihardware -I. hardware/simulated/display_text.c 
 	$(CC) $(CFLAGS) -c -Ihardware -I. hardware/simulated/hardware_sim.c 
 	$(CC) $(CFLAGS) -c -Ihardware -I. bubbly.c       

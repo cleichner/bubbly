@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+while true
+do 
+python mazes/mazegen.py 16 > /tmp/tmp_maze16x16
+./softbot /tmp/tmp_maze16x16
+done

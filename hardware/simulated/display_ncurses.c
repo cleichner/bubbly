@@ -11,7 +11,7 @@ void init_display(void) {
     init_pair(1, COLOR_RED, COLOR_BLACK);
 }
 void finalize_display(void) {
-    sleep(2);
+    sleep(4);
     endwin();
 }
 void display_maze(struct cell maze[WIDTH][HEIGHT], 

@@ -31,6 +31,9 @@ void turn_right(int8_t n);
 // respect to the robot.
 bool has_wall(side_t side);
 
-direction_t fast_execute_actions(struct action actions[ACTION_SIZE]);
+// This passes the full list of actions down to the hardware to execute as fast
+// as possible. It is only called after the entire maze has been mapped and all
+// walls are known.
+void fast_execute_actions(struct action actions[ACTION_SIZE]);
 
 #endif // HARDWARE_H

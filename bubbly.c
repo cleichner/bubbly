@@ -290,7 +290,7 @@ bool has_not_visted(struct cell maze[WIDTH][HEIGHT]) {
     return false;
 }
 
-struct point not_visited_in(struct cell maze[WIDTH][HEIGHT]) {
+struct point get_not_visited(struct cell maze[WIDTH][HEIGHT]) {
     int8_t i,j;
     struct point pos = {.x = 0, .y = 0};
     int16_t min = INT16_MAX;
@@ -307,6 +307,23 @@ struct point not_visited_in(struct cell maze[WIDTH][HEIGHT]) {
         }
     }
     return pos;
+}
+
+direction_t end_direction(struct action actions[ACTION_SIZE]) {
+    direction_t left[] = {WEST, EAST, NORTH, SOUTH};
+    direction_t right[] = {EAST, WEST, SOUTH, NORTH};
+    int16_t i;
+    int16_t j;
+    direction_t heading = current_direction;
+    for (i = 0; i < ACTION_SIZE; i++) {
+        for (j = 0; j < actions[i].times; j++) {
+            if (actions[i].move == turn_left)
+                heading = heading[left];
+            if (actions[i].move == turn_right)
+                heading = heading[right];
+        }
+    }
+    return heading;
 }
 
 int main(int argc, char* argv[]) {
@@ -330,7 +347,7 @@ int main(int argc, char* argv[]) {
     // map the maze
     while (has_not_visted(maze)) {
         do {
-            find_path(actions, maze, position, not_visited_in(maze));
+            find_path(actions, maze, position, get_not_visited(maze));
         } while (!safe_execute_actions(maze, actions));
     }
 
@@ -343,11 +360,13 @@ int main(int argc, char* argv[]) {
     // optimize the path, not implemented 
     // run it as fast as possible, not implemented
     find_path(actions, maze, position, goal);
-    current_direction = fast_execute_actions(actions);
+    fast_execute_actions(actions);
+    current_direction = end_direction(actions);
     position = goal;
 
     find_path(actions, maze, position, start);
-    current_direction = fast_execute_actions(actions);
+    fast_execute_actions(actions);
+    current_direction = end_direction(actions);
     position = start;
 
     finalize_hardware();

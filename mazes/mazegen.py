@@ -53,10 +53,15 @@ if __name__ == "__main__":
         if y != size-1:
             neighbors[node].add((x,y+1))
 
-    starting_node = random.choice(tuple(neighbors))
+    start = (0,0)
+    second = (0,1)
+    graph[start].add(second)
+    graph[second].add(start)
+
     #Implementation of a growing tree algorithm to decide how nodes are connected
-    visited.add(starting_node)
-    next_set.add(starting_node)
+    seed = random.choice(tuple(neighbors))
+    visited.add(seed)
+    next_set.add(seed)
     while next_set:
         next_node = random.choice(tuple(next_set))
         if all(n in visited for n in neighbors[next_node]):

@@ -27,5 +27,8 @@ void enc_init (void);
 //Will also increment the global variables r_state and l_state
 void update_encoder (void);
 
+//Will turn on LED2 & LED3 based on the directions of the motors
+void encoder_debug (void);
+
 #endif
 

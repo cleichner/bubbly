@@ -20,15 +20,12 @@
 
 
 
-//Configures the ATMEGA registers for correct usage of the
+//Configures the ATMEGA328p registers for correct usage of the
 //PORTD interrupts.
 void enc_init(void) {
     
-    //Enable Serial Debugging
     //Note: This means only the right motor can be debugged as the left one
     //      uses PD0(RX) and PD1(TX)
-    //Serial.begin(9600);
-    //Serial.println("Initalizing Serial");
     
     //Configure Pins PD5 & PD6 as inputs by setting (0)
     DDRD &= ~(1<<5);
@@ -67,41 +64,89 @@ void update_encoder (void){
     //1     1    0   2
     //2     1    1   3
     //3     0    1   1
-    //4     0    0   0  
-    switch(right_current_A){
-        case 0:
-            if(!right_past_B) right_turns++;
-            else right_turns--;
-            break;
-            
-        case 1:
-            if(right_past_B) right_turns++;
-            else right_turns--;
-            break;
-            
-        default:
-            break;
+    //4     0    0   0
+    if (REUF == TRUE) {
+        REUF = FALSE;
+        switch(right_current_A){
+            case 0:
+                if(!right_past_B){
+                    right_turns++;
+                    right_direction = FORWARD;
+                }
+                else{
+                    right_turns--;
+                    right_direction = REVERSE;
+                }
+                break;
+                
+            case 1:
+                if(right_past_B){
+                    right_turns++;
+                    right_direction = FORWARD;
+                }else{
+                    right_turns--;
+                    right_direction = REVERSE;
+                }
+                break;
+                
+            default:
+                break;
+        }
+        //Update the past
+        right_past_A = right_current_A;
+        right_past_B = right_current_B;
     }
-    //Update the past
-    right_past_A = right_current_A;
-    right_past_B = right_current_B;
     
-    switch(left_current_A){
-        case 0:
-            if(!left_past_B) left_turns++;
-            else left_turns--;
-            break;
-            
-        case 1:
-            if(left_past_B) left_turns++;
-            else left_turns--;
-            break;
-            
-        default:
-            break;
+    if (LEUF == TRUE) {
+        LEUF = FALSE;
+        switch(left_current_A){
+            case 0:
+                if(!left_past_B){
+                    left_turns++;
+                    left_direction = FORWARD;
+                }else{
+                    left_turns--;
+                    left_direction = REVERSE;
+                }
+                break;
+                
+            case 1:
+                if(left_past_B){
+                    left_turns++;
+                    left_direction = FORWARD;
+                }else{
+                    left_turns--;
+                    left_direction = REVERSE;
+                }
+                break;
+                
+            default:
+                break;
+        }
+        
+        left_past_A = left_current_A;
+        left_past_B = left_current_B;
     }
-    left_past_A = left_current_A;
-    left_past_B = left_current_B;
     sei();
     
 }
+
+void encoder_debug (void){
+    EUF = FALSE;
+    //If the right motor is going forward
+    //Turn on LED2
+    if (right_direction == FORWARD) {
+        PORTC |= _BV(2);
+    }else{
+        PORTC &= ~(_BV(2));
+    }
+    
+    //If the left motor is going forward
+    //Turn on LED3
+    if (left_direction == FORWARD) {
+        PORTC |= _BV(3);
+    }else{
+        PORTC |= _BV(3);
+    }
+}
+

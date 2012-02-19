@@ -5,18 +5,27 @@ from collections import defaultdict
 
 def print_graph(graph,size):
   str = ' '
+  # print ('start')
   for x in range(size):
     str+= '_ '
   str+='\n'
   default = size-1;
-  
   for j in range(size):
     str+='|'
     for i in range(size):
+      # print('for node: ',end="") 
+      # print(graph[(i,default-j)])
+      # print('looking below to node ',end="")
+      # print((i,default-j-1))
       if (i, (default-j-1)) not in graph[(i,default-j)]:
         str+='_'
       else:
         str+=' '
+      # print('for node: ',end="") 
+      # print(graph[(i,default-j)])
+      # print('looking to right for node ',end="")
+      # print((i+1,default-j))
+      # print()
       if (i+1, default-j) not in graph[(i,default-j)]:
         str+='|'
       else:
@@ -33,7 +42,7 @@ if __name__ == "__main__":
   
   size = int(argv[1])
   
-  if size < 6 or size%2 == 1:
+  if size < 4 or size%2 == 1:
     print ('Incorrect size. Must be even. Min: 6')
     exit(1)
   
@@ -52,22 +61,20 @@ if __name__ == "__main__":
       neighbors[node].add((x+1,y))
     if y != size-1:
       neighbors[node].add((x,y+1))
-
   first = random.choice(tuple(neighbors))
+  visited.add(first)
   next_set.add(first)
-  
   while next_set:
-    next_list = random.sample(next_set, 1)
-    next_node = next_list.pop()
-    count = 0
-    for n in neighbors[next_node]:
-      if n not in visited:
-        next_set.add(n)
-        visited.add(n)
-        graph[next_node].add(n)
-        break
-      if count+1 == len(neighbors[next_node]):
-        next_set.remove(next_node)
-      count += 1
-      
+    next_node = random.choice(tuple(next_set))
+    if all(n in visited for n in neighbors[next_node]):
+      next_set.remove(next_node)
+    else:
+      for n in neighbors[next_node]:
+        if n not in visited:
+          next_set.add(n)
+          visited.add(n)
+          graph[next_node].add(n)
+          graph[n].add(next_node)
+          break      
+
   print_graph(graph,size)

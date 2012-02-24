@@ -27,15 +27,23 @@ void enc_init(void) {
     //Note: This means only the right motor can be debugged as the left one
     //      uses PD0(RX) and PD1(TX)
     
-    //Configure Pins PD5 & PD6 as inputs by setting (0)
+    //Configure Pins PD0,PD1,PD5,PD6 as inputs by setting (0)
     DDRD &= ~(1<<5);
     DDRD &= ~(1<<6);
+    DDRD &= ~(1<<0);
+    DDRD &= ~(1<<1);
     
     //Enable Interrupt Procedure
+    //The following pins will trigger an interrupt at vector
+    //PCINT2_vect
     PCMSK2 |= (1<<PCINT21);
-    //A logic change on PCINT21 will enable interrupt to PCINT2_vect
     PCMSK2 |= (1<<PCINT22);
+    PCMSK2 |= (1<<PCINT16);
+    PCMSK2 |= (1<<PCINT17);
     PCICR |= (1<<PCIE2);
+    
+    right_direction = FORWARD;
+    left_direction = FORWARD;
     
     //Enable all interrupts
     sei();
@@ -45,7 +53,7 @@ void enc_init(void) {
 
 void update_encoder (void){
     //Reset flag
-    EUF = 0;
+    EUF = FALSE;
     cli();
     //Now find out which motors changed and in which direction
     //using the following coding
@@ -123,16 +131,18 @@ void update_encoder (void){
             default:
                 break;
         }
-        
+        //update the past
         left_past_A = left_current_A;
         left_past_B = left_current_B;
     }
+    //Enable Interrupts
     sei();
-    
 }
 
 void encoder_debug (void){
+    
     EUF = FALSE;
+    
     //If the right motor is going forward
     //Turn on LED2
     if (right_direction == FORWARD) {
@@ -146,7 +156,8 @@ void encoder_debug (void){
     if (left_direction == FORWARD) {
         PORTC |= _BV(3);
     }else{
-        PORTC |= _BV(3);
+        PORTC &= ~(_BV(3));
     }
+    
 }
 

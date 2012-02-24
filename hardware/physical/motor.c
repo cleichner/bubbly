@@ -3,7 +3,6 @@
 //  
 //
 //  Created by Kevin Klug on 2/18/12.
-//  Copyright (c) 2012 Univeristy of Arizona. All rights reserved.
 //
 
 #include <stdio.h>

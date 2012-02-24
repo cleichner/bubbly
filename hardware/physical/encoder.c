@@ -28,10 +28,11 @@ void enc_init(void) {
     //      uses PD0(RX) and PD1(TX)
     
     //Configure Pins PD0,PD1,PD5,PD6 as inputs by setting (0)
-    DDRD &= ~(1<<5);
-    DDRD &= ~(1<<6);
-    DDRD &= ~(1<<0);
-    DDRD &= ~(1<<1);
+    DDRD &= ~(1<<PORTD0);
+    DDRD &= ~(1<<PORTD1);
+    DDRD &= ~(1<<PORTD5);
+    DDRD &= ~(1<<PORTD6);
+
     
     //Enable Interrupt Procedure
     //The following pins will trigger an interrupt at vector
@@ -53,7 +54,7 @@ void enc_init(void) {
 
 void update_encoder (void){
     //Reset flag
-    EUF = FALSE;
+    EUF = false;
     cli();
     //Now find out which motors changed and in which direction
     //using the following coding
@@ -73,27 +74,39 @@ void update_encoder (void){
     //2     1    1   3
     //3     0    1   1
     //4     0    0   0
-    if (REUF == TRUE) {
-        REUF = FALSE;
+    if (REUF == true) {
+        REUF = false;
         switch(right_current_A){
             case 0:
                 if(!right_past_B){
+                    if (right_direction == REVERSE) {
+                        right_direction = FORWARD;
+                        right_turns = 0;
+                    }
                     right_turns++;
-                    right_direction = FORWARD;
                 }
                 else{
+                    if (right_direction == FORWARD) {
+                        right_direction = REVERSE;
+                        right_turns = 0;
+                    }
                     right_turns--;
-                    right_direction = REVERSE;
                 }
                 break;
                 
             case 1:
                 if(right_past_B){
+                    if (right_direction == REVERSE) {
+                        right_direction = FORWARD;
+                        right_turns = 0;
+                    }
                     right_turns++;
-                    right_direction = FORWARD;
                 }else{
+                    if (right_direction == FORWARD) {
+                        right_direction = REVERSE;
+                        right_turns = 0;
+                    }
                     right_turns--;
-                    right_direction = REVERSE;
                 }
                 break;
                 
@@ -105,26 +118,39 @@ void update_encoder (void){
         right_past_B = right_current_B;
     }
     
-    if (LEUF == TRUE) {
-        LEUF = FALSE;
+    if (LEUF == true) {
+        LEUF = false;
         switch(left_current_A){
             case 0:
                 if(!left_past_B){
+                    //If the direction changed reset number
+                    //of turns.
+                    if (left_direction == REVERSE) {
+                        left_direction = FORWARD;
+                        left_turns = 0;
+                    }
                     left_turns++;
-                    left_direction = FORWARD;
                 }else{
+                    if (left_direction == FORWARD) {
+                        left_direction = REVERSE;
+                        left_turns = 0;
+                    }
                     left_turns--;
-                    left_direction = REVERSE;
                 }
                 break;
                 
             case 1:
                 if(left_past_B){
+                    if (left_direction == REVERSE) {
+                        left_direction = FORWARD;
+                        left_direction = 0;
+                    }
                     left_turns++;
-                    left_direction = FORWARD;
                 }else{
+                    if (left_direction == FORWARD) {
+                        left_direction = REVERSE;
+                    }
                     left_turns--;
-                    left_direction = REVERSE;
                 }
                 break;
                 
@@ -141,22 +167,22 @@ void update_encoder (void){
 
 void encoder_debug (void){
     
-    EUF = FALSE;
+    EUF = false;
     
     //If the right motor is going forward
     //Turn on LED2
     if (right_direction == FORWARD) {
-        PORTC |= _BV(2);
+        PORTC |= _BV(PORTC2);
     }else{
-        PORTC &= ~(_BV(2));
+        PORTC &= ~(_BV(PORTC2));
     }
     
     //If the left motor is going forward
     //Turn on LED3
     if (left_direction == FORWARD) {
-        PORTC |= _BV(3);
+        PORTC |= _BV(PORTC3);
     }else{
-        PORTC &= ~(_BV(3));
+        PORTC &= ~(_BV(PORTC3));
     }
     
 }

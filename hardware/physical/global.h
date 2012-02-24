@@ -9,23 +9,20 @@
 #define _global_h
 
 #include <avr/io.h>
-
-#define TRUE 1
-#define FALSE 0
+#include <stdbool.h>
 
 #define FORWARD 1
 #define REVERSE 0
 
-//**************************************************
 //ENCODER VARIABLES & Definitions
 //
 //Left Motor Encoder
-#define PinD0 0x01 //A
-#define PinD1 0x02 //B
+//#define PinD0 0x01 //A
+//#define PinD1 0x02 //B
 
 //Right Motor Encoder
-#define PinD5 0x10 //A 
-#define PinD6 0x20 //B 
+//#define PinD5 0x10 //A 
+//#define PinD6 0x20 //B 
 
 #define FORWARD 1
 #define REVERSE 0
@@ -54,7 +51,6 @@ volatile uint8_t EUF;
 volatile uint8_t LEUF;
 volatile uint8_t REUF;
 
-//**************************************************
 //MOTOR CONTROL VARIABLES AND DEFINITIONS
 //
 //Total Motor Current

@@ -5,48 +5,42 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-//*****************//
 //Digital ISR
-//*****************//
 ISR(PCINT2_vect){
     
     //Check to see which pin has changed by comparing the value actually on the pin
     //to the one stored in the respective variable. If there is a change, update current
     
     //Left motor
-    if( (PIND & PinD0) != left_current_A){
-        left_current_A = (PIND & PinD0);
-        LEUF = TRUE;
-        EUF = TRUE; 
+    if( (PIND & PIND0) != left_current_A){
+        left_current_A = (PIND & PIND0);
+        LEUF = true;
+        EUF = true; 
     }
-    if( (PIND & PinD1) != left_current_B){
-        left_current_B = (PIND & PinD1);
-        LEUF = TRUE;
-        EUF = TRUE;
+    if( (PIND & PIND1) != left_current_B){
+        left_current_B = (PIND & PIND1);
+        LEUF = true;
+        EUF = true;
     }
     
     //Right motor
-    if( (PIND & PinD5) != right_current_A){
-        right_current_A = (PIND & PinD5);
-        REUF = TRUE;
-        EUF = TRUE;
+    if( (PIND & PIND5) != right_current_A){
+        right_current_A = (PIND & PIND5);
+        REUF = true;
+        EUF = true;
     }
-    if( (PIND & PinD6) != right_current_B){
-        right_current_B = (PIND & PinD6);
-        REUF = TRUE;
-        EUF = TRUE;
+    if( (PIND & PIND6) != right_current_B){
+        right_current_B = (PIND & PIND6);
+        REUF = true;
+        EUF = true;
     }
-    
-    //EUF = TRUE;
-    
+        
     //Encoder Update Flag
     sei();
     
 }
 
-//****************//
 //ADC ISR
-//****************//
 ISR (ADC_vect){
     cli();
     
@@ -66,10 +60,7 @@ ISR (ADC_vect){
     sei();
 }
 
-
-//***************//
-//MAIN FUNCTION  //
-//***************//
+//MAIN FUNCTION 
 int main(void) {
     
     enc_init();
@@ -77,8 +68,8 @@ int main(void) {
     
     //Some debugging using LED2 and LED3 on the board
     //Configure Pins PC2 & PC3 as outputs
-    DDRC |= _BV(2);
-    DDRC |= _BV(3);
+    DDRC |= _BV(PORTC2);
+    DDRC |= _BV(PORTC3);
     
     
     //This is Debugging stuff
@@ -87,8 +78,8 @@ int main(void) {
     motor_set_speed('l',3);
     motor_set_speed('r',3);
     
-    PORTC &= ~(_BV(2));
-    PORTC &= ~(_BV(3));
+    PORTC &= ~(_BV(PORTC2));
+    PORTC &= ~(_BV(PORTC3));
     
     while (1){
         

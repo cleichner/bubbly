@@ -4,6 +4,11 @@
 //
 //  Created by Kevin Klug on 2/18/12.
 //
+//  Description:
+//      Controls two motors M1 & M1 on pins PB1 & PB2 using PWM. For more information go to
+//      http://www.sparkfun.com/products/9571 .
+//  Much Credit for this code goes to the Sparkfun Open source for
+//  the Serial Controlled Dual Motor Controller
 
 #include <stdio.h>
 #include <avr/io.h>
@@ -18,11 +23,7 @@ void motor_init (void)
     //Enabling PWM and SPI outputs
     DDRB = (1<<PWM1)|(1<<PWM2)|(1<<MOSI)|(1<<SCK);
     PORTB = (1<<MISO);//Enable MISO pull-up
-    
-    //All pins on Port D as inputs
-    //DDRC = 0xFF
-    
-    
+        
     //Enable PWM using Timer 1 using 10 BIT Fast mode
     //Output toggle on OC1A and OC1B
     //
@@ -37,7 +38,6 @@ void motor_init (void)
     ADMUX = motor_current_monitor-'0';//ADC Channel 0
 	ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
     //Enable the ADC, auto-triggering, the ADC Interrupt and set the ADC prescaler to 64
-    //ADC clock = 250kHz
 	ADCSRA |= (1<<ADSC);	//Start the first conversion
 }
 

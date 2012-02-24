@@ -27,27 +27,8 @@ void enc_init (void);
 //Will also increment the global variables r_state and l_state
 void update_encoder (void);
 
-//*******************
-//LOW LEVEL FUNCTIONS
-//*******************
-
-//The following preform bit operations to return the requested
-//value that is stored in current_state
-inline int8_t left_current_state (void){
-    return (current_state & (PinD0+PinD1));
-}
-inline int8_t right_current_state (void){
-    return (current_state & ((PinD5+PinD6)>>4));
-}
-
-inline int8_t left_past_state (void){
-    return (current_state & ((PinD0+PinD1)>>2));
-}
-inline int8_t right_past_state (void){
-    return (current_state & ((PinD5+PinD6)>>6));
-}
-
-
+//Will turn on LED2 & LED3 based on the directions of the motors
+void encoder_debug (void);
 
 #endif
 

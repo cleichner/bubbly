@@ -45,7 +45,7 @@ FORMAT = ihex
 # Optimization [0, 1, 2, 3, s]
 OPT = s
 
-CSTANDARD = -std=c99
+CSTANDARD = -std=gnu99
 CFLAGS =  -Wall 
 CFLAGS += -O$(OPT)
 CFLAGS += -Werror

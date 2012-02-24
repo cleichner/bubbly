@@ -2,6 +2,7 @@
 
 while true
 do 
-python mazes/mazegen.py 16 > /tmp/tmp_maze16x16
-./softbot /tmp/tmp_maze16x16
+python mazes/mazegen.py 16 > tmp_maze16x16
+./softbot tmp_maze16x16
+rm tmp_maze16x16
 done

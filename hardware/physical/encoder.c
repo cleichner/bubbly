@@ -143,12 +143,13 @@ void update_encoder (void){
                 if(left_past_B){
                     if (left_direction == REVERSE) {
                         left_direction = FORWARD;
-                        left_direction = 0;
+                        left_turns = 0;
                     }
                     left_turns++;
                 }else{
                     if (left_direction == FORWARD) {
                         left_direction = REVERSE;
+                        left_turns = 0;
                     }
                     left_turns--;
                 }

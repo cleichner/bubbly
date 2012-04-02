@@ -166,6 +166,24 @@ void update_encoder (void){
     sei();
 }
 
+//Some debugging using LED2 and LED3 on the board
+void encoder_debug_init (void){
+    //Configure Pins PC2 & PC3 as outputs
+    DDRC |= _BV(PORTC2);
+    DDRC |= _BV(PORTC3);
+    
+    
+    //This is Debugging stuff
+    motor_set_direction('l', 'r');
+    motor_set_direction('r', 'r');
+    motor_set_speed('l',3);
+    motor_set_speed('r',3);
+    
+    PORTC &= ~(_BV(PORTC2));
+    PORTC &= ~(_BV(PORTC3));
+}
+
+//For this to work encoder_debug_init must be run prior!
 void encoder_debug (void){
     
     EUF = false;
@@ -187,4 +205,3 @@ void encoder_debug (void){
     }
     
 }
-

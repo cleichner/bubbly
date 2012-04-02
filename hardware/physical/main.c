@@ -66,31 +66,13 @@ int main(void) {
     enc_init();
     motor_init();
     
-    //Some debugging using LED2 and LED3 on the board
-    //Configure Pins PC2 & PC3 as outputs
-    DDRC |= _BV(PORTC2);
-    DDRC |= _BV(PORTC3);
-    
-    
-    //This is Debugging stuff
-    motor_set_direction('l', 'r');
-    motor_set_direction('r', 'r');
-    motor_set_speed('l',3);
-    motor_set_speed('r',3);
-    
-    PORTC &= ~(_BV(PORTC2));
-    PORTC &= ~(_BV(PORTC3));
-    
+    //encoder_debug_init();
     while (1){
         
         if (EUF) {
             update_encoder();
-            encoder_debug();
+            //encoder_debug();
         }
 
     }
 }
-
-
-
-

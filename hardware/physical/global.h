@@ -11,9 +11,6 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-#define FORWARD 1
-#define REVERSE 0
-
 //ENCODER VARIABLES & Definitions
 //
 //Left Motor Encoder
@@ -37,10 +34,11 @@ volatile uint8_t right_current_A;
 volatile uint8_t right_current_B;
 volatile uint8_t right_past_A;
 volatile uint8_t right_past_B;
+volatile uint8_t encoder_buff;
 
 //These count the number of turns
-volatile uint8_t right_turns;
-volatile uint8_t left_turns;
+volatile uint16_t right_turns;
+volatile uint16_t left_turns;
 
 //These indicate the last known direction
 volatile uint8_t right_direction;

@@ -23,17 +23,21 @@
 //Configures the ATMEGA328p registers for correct usage of the
 //PORTD interrupts.
 void enc_init(void) {
-    
     //Note: This means only the right motor can be debugged as the left one
     //      uses PD0(RX) and PD1(TX)
-    
-    //Configure Pins PD0,PD1,PD5,PD6 as inputs by setting (0)
-    DDRD &= ~(1<<PORTD0);
-    DDRD &= ~(1<<PORTD1);
-    DDRD &= ~(1<<PORTD5);
-    DDRD &= ~(1<<PORTD6);
 
-    
+    //Configure Pins PD0,PD1,PD5,PD6 as inputs by setting (0)
+    DDRD &= ~(1<<DDD0);
+    DDRD &= ~(1<<DDD1);
+    DDRD &= ~(1<<DDD5);
+    DDRD &= ~(1<<DDD6);
+
+    //Pull Ups
+    PORTD |= _BV(PORTD0);
+    PORTD |= _BV(PORTD1);
+    PORTD |= _BV(PORTD5);
+    PORTD |= _BV(PORTD6);
+
     //Enable Interrupt Procedure
     //The following pins will trigger an interrupt at vector
     //PCINT2_vect
@@ -42,13 +46,13 @@ void enc_init(void) {
     PCMSK2 |= (1<<PCINT16);
     PCMSK2 |= (1<<PCINT17);
     PCICR |= (1<<PCIE2);
-    
+
     right_direction = FORWARD;
     left_direction = FORWARD;
-    
+
     //Enable all interrupts
     sei();
-    
+
 }
 
 
@@ -58,7 +62,7 @@ void update_encoder (void){
     cli();
     //Now find out which motors changed and in which direction
     //using the following coding
-    
+
     //Encoding Table
     //__________________
     //Clockwise Rotation
@@ -83,81 +87,75 @@ void update_encoder (void){
                         right_direction = FORWARD;
                         right_turns = 0;
                     }
-                    right_turns++;
                 }
                 else{
                     if (right_direction == FORWARD) {
                         right_direction = REVERSE;
                         right_turns = 0;
                     }
-                    right_turns--;
                 }
                 break;
-                
+
             case 1:
                 if(right_past_B){
                     if (right_direction == REVERSE) {
                         right_direction = FORWARD;
                         right_turns = 0;
                     }
-                    right_turns++;
                 }else{
                     if (right_direction == FORWARD) {
                         right_direction = REVERSE;
                         right_turns = 0;
                     }
-                    right_turns--;
                 }
                 break;
-                
+
             default:
                 break;
         }
+        right_turns++;
         //Update the past
         right_past_A = right_current_A;
         right_past_B = right_current_B;
     }
-    
+
     if (LEUF == true) {
         LEUF = false;
         switch(left_current_A){
             case 0:
                 if(!left_past_B){
-                    //If the direction changed reset number
-                    //of turns.
                     if (left_direction == REVERSE) {
                         left_direction = FORWARD;
                         left_turns = 0;
                     }
-                    left_turns++;
-                }else{
+                }
+                else{
                     if (left_direction == FORWARD) {
                         left_direction = REVERSE;
                         left_turns = 0;
                     }
-                    left_turns--;
                 }
                 break;
-                
+
             case 1:
                 if(left_past_B){
                     if (left_direction == REVERSE) {
                         left_direction = FORWARD;
-                        left_direction = 0;
+                        left_turns = 0;
                     }
-                    left_turns++;
                 }else{
                     if (left_direction == FORWARD) {
                         left_direction = REVERSE;
+                        left_turns = 0;
                     }
-                    left_turns--;
                 }
                 break;
-                
+
             default:
                 break;
         }
-        //update the past
+        left_turns++;
+        //Update the past
         left_past_A = left_current_A;
         left_past_B = left_current_B;
     }
@@ -165,25 +163,43 @@ void update_encoder (void){
     sei();
 }
 
+//Some debugging using LED2 and LED3 on the board
+void encoder_debug_init (void){
+    //Configure Pins PC2 & PC3 as outputs
+    DDRC |= _BV(PORTC2);
+    DDRC |= _BV(PORTC3);
+
+
+    //This is Debugging stuff
+    motor_set_direction('l', 'f');
+    motor_set_direction('r', 'f');
+    motor_set_speed('l',0);
+    motor_set_speed('r',0);
+
+    PORTC &= ~(_BV(PORTC2));
+    PORTC &= ~(_BV(PORTC3));
+}
+
+//For this to work encoder_debug_init must be run prior!
 void encoder_debug (void){
-    
+
     EUF = false;
-    
+
     //If the right motor is going forward
-    //Turn on LED2
+    //Turn on right LED
     if (right_direction == FORWARD) {
-        PORTC |= _BV(PORTC2);
-    }else{
-        PORTC &= ~(_BV(PORTC2));
-    }
-    
-    //If the left motor is going forward
-    //Turn on LED3
-    if (left_direction == FORWARD) {
         PORTC |= _BV(PORTC3);
     }else{
         PORTC &= ~(_BV(PORTC3));
     }
-    
-}
 
+    //This one is the problem one
+    //If the left motor is going forward
+    //Turn on left LED
+    if (left_direction == FORWARD) {
+        PORTC |= _BV(PORTC2);
+    }else{
+        PORTC &= ~(_BV(PORTC2));
+    }
+
+}

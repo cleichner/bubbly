@@ -7,46 +7,53 @@
 
 //Digital ISR
 ISR(PCINT2_vect){
-    
+
     //Check to see which pin has changed by comparing the value actually on the pin
     //to the one stored in the respective variable. If there is a change, update current
-    
+
     //Left motor
-    if( (PIND & PIND0) != left_current_A){
-        left_current_A = (PIND & PIND0);
-        LEUF = true;
-        EUF = true; 
-    }
-    if( (PIND & PIND1) != left_current_B){
-        left_current_B = (PIND & PIND1);
+    encoder_buff = (PIND & _BV(PIND0));
+    if( encoder_buff != left_current_A){
+        left_current_A = encoder_buff;
         LEUF = true;
         EUF = true;
     }
-    
+
+    encoder_buff = (PIND & _BV(PIND1));
+    if( encoder_buff != left_current_B){
+        left_current_B = encoder_buff;
+        LEUF = true;
+        EUF = true;
+    }
+
     //Right motor
-    if( (PIND & PIND5) != right_current_A){
-        right_current_A = (PIND & PIND5);
+    encoder_buff = (PIND & _BV(PIND6));
+    if( encoder_buff != right_current_A){
+        right_current_A = encoder_buff;
         REUF = true;
         EUF = true;
     }
-    if( (PIND & PIND6) != right_current_B){
-        right_current_B = (PIND & PIND6);
+    encoder_buff = (PIND & _BV(PIND5));
+    if( encoder_buff != right_current_B){
+        right_current_B = encoder_buff;
         REUF = true;
         EUF = true;
     }
-        
+
+    update_encoder();
+    encoder_debug();
+
     //Encoder Update Flag
     sei();
-    
 }
 
 //ADC ISR
 ISR (ADC_vect){
     cli();
-    
+
     current = ADCL;
     current |= ADCH<<8;
-    
+
     if (current > CURRENT_THRESHOLD) {
         //Stop all motors
         motor_set_speed( 'r', 0);
@@ -54,43 +61,67 @@ ISR (ADC_vect){
     }
     if (motor_current_monitor == '0') motor_current_monitor = '1';
     else motor_current_monitor = '0';
-    
+
     ADMUX = motor_current_monitor-'0';
-    
+
     sei();
 }
 
-//MAIN FUNCTION 
+void move_forward(int8_t n) {
+    int8_t i;
+    motor_set_direction('r', 'f');
+    motor_set_direction('l', 'f');
+    motor_set_speed('r', 9);
+    motor_set_speed('l', 9);
+    for (i = 0; i < n; i++) {
+        while (right_turns < 500);
+        right_turns = 0;
+    }
+    motor_set_speed('r', 0);
+    motor_set_speed('l', 0);
+}
+
+//MAIN FUNCTION
 int main(void) {
-    
+
     enc_init();
     motor_init();
-    
-    //Some debugging using LED2 and LED3 on the board
-    //Configure Pins PC2 & PC3 as outputs
-    DDRC |= _BV(PORTC2);
-    DDRC |= _BV(PORTC3);
-    
-    
-    //This is Debugging stuff
-    motor_set_direction('l', 'r');
-    motor_set_direction('r', 'r');
-    motor_set_speed('l',3);
-    motor_set_speed('r',3);
-    
-    PORTC &= ~(_BV(PORTC2));
-    PORTC &= ~(_BV(PORTC3));
-    
+
+    encoder_debug_init();
+
+
+    right_turns = 0;
+    left_turns = 0;
+    right_direction = REVERSE;
+    left_direction = REVERSE;
+
+    encoder_debug_init();
+
+    DDRC &= ~(_BV(DDC5));
+    uint8_t sensor_status = (PINC &_BV(PINC5));
+    uint8_t sensor_poll;
+
+    move_forward(3);
     while (1){
-        
+        /*
         if (EUF) {
             update_encoder();
             encoder_debug();
         }
+        */
 
+/*
+        sensor_poll = PINC & _BV(PINC5);
+        if(sensor_poll != sensor_status) {
+            sensor_status = sensor_poll;
+            if (right_direction == FORWARD) {
+                motor_set_direction('l', 'r');
+                motor_set_direction('r', 'r');
+            } else {
+                motor_set_direction('l', 'f');
+                motor_set_direction('r', 'f');
+            }
+        }
+    */
     }
 }
-
-
-
-

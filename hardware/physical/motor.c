@@ -45,9 +45,9 @@ void motor_set_direction( char motor, char direction){
     if (motor == 'r') {
         //Right motor is M1
         if (direction == 'f') {
-            M1_FORWARD();
-        }else{
             M1_REVERSE();
+        }else{
+            M1_FORWARD();
         }
     }else{
         //Left motor is M2

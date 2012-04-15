@@ -1,12 +1,6 @@
-//
-//  motor.c
-//  
-//
-//  Created by Kevin Klug on 2/18/12.
-//
 //  Description:
-//      Controls two motors M1 & M1 on pins PB1 & PB2 using PWM. For more information go to
-//      http://www.sparkfun.com/products/9571 .
+//      Controls two motors M1 & M1 on pins PB1 & PB2 using PWM. For more
+//      information go to http://www.sparkfun.com/products/9571 .
 //  Much Credit for this code goes to the Sparkfun Open source for
 //  the Serial Controlled Dual Motor Controller
 
@@ -17,28 +11,34 @@
 #include "motor.h"
 #include "global.h"
 
+void motor_init (void) {
+    //Enabling PWM outputs
+    DDRB = _BV(PWM1) | _BV(PWM2);
 
-void motor_init (void)
-{
-    //Enabling PWM and SPI outputs
-    DDRB = (1<<PWM1)|(1<<PWM2)|(1<<MOSI)|(1<<SCK);
-    PORTB = (1<<MISO);//Enable MISO pull-up
-        
     //Enable PWM using Timer 1 using 10 BIT Fast mode
     //Output toggle on OC1A and OC1B
     //
     //Set toggle mode for PWM pins and set 10bit fast PWM mode
-    TCCR1A = (1<<COM1A1) | (1<<COM1B1) | (1<<WGM10) | (1<<WGM11);
-    TCCR1B = (1<<WGM12);	//Set 8bit fast PWM mode
+    TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(WGM10) | _BV(WGM11);
+    TCCR1B = _BV(WGM12);	//Set 8bit fast PWM mode
     OCR1A = 0;
 	OCR1B = 0;
-    TCCR1B |= (1<<CS12);
-    
-    //Motor Current Protection
-    ADMUX = motor_current_monitor-'0';//ADC Channel 0
-	ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
-    //Enable the ADC, auto-triggering, the ADC Interrupt and set the ADC prescaler to 64
-	ADCSRA |= (1<<ADSC);	//Start the first conversion
+    TCCR1B |= _BV(CS12);
+
+    // Motor Current Protection
+    ADMUX = 0; // ADC Channel 0
+
+	ADCSRA = _BV(ADEN)  // ADC enable
+           | _BV(ADATE) // Auto-trigger enable
+           | _BV(ADIE)  // Interrupt enable
+
+           | _BV(ADPS2) // 128 prescaler
+           | _BV(ADPS1)
+           | _BV(ADPS0)
+           ;
+
+    // Start the first conversion
+	ADCSRA |= _BV(ADSC);
 }
 
 void motor_set_direction( char motor, char direction){
@@ -46,30 +46,30 @@ void motor_set_direction( char motor, char direction){
         //Right motor is M1
         if (direction == 'f') {
             M1_FORWARD();
-        }else{
+        } else {
             M1_REVERSE();
         }
-    }else{
+    } else {
         //Left motor is M2
         if (direction == 'f') {
             M2_FORWARD();
-        }else{
+        } else {
             M2_REVERSE();
         }
     }
 }
 
 void motor_set_speed( char motor, int speed){
-    if (motor == 'r'){
-        if (speed== 9) {
+    if (motor == 'r') {
+        if (speed == 9)  {
             OCR1A = 0x3FF;
-        }else{
+        } else {
             OCR1A = SPEED_UNIT*speed;
         }
-    }else{
-        if (speed==9) {
+    } else {
+        if (speed == 9) {
             OCR1B = 0x3FF;
-        }else{
+        } else {
             OCR1B = SPEED_UNIT*speed;
         }
     }

@@ -1,16 +1,8 @@
-//***************************************************************//
-//
-//File: encoder.c
-//Author: Kevin Klug
-//Date: 2/14/2012
-//
-//Description: The following code will count the phase of two quadrature
+// Description: The following code will count the phase of two quadrature
 //             encoded motors that are connected to an ATMEGA168
 //             microcontroller. It stores its phase as well as the
 //             number of turns in global variables which are accessed
 //             in ISR
-//
-//***************************************************************//
 
 #include "encoder.h"
 #include "global.h"
@@ -23,32 +15,30 @@
 //Configures the ATMEGA328p registers for correct usage of the
 //PORTD interrupts.
 void enc_init(void) {
-    
+
     //Note: This means only the right motor can be debugged as the left one
     //      uses PD0(RX) and PD1(TX)
-    
-    //Configure Pins PD0,PD1,PD5,PD6 as inputs by setting (0)
-    DDRD &= ~(1<<PORTD0);
-    DDRD &= ~(1<<PORTD1);
-    DDRD &= ~(1<<PORTD5);
-    DDRD &= ~(1<<PORTD6);
 
-    
+    //Configure Pins PD0,PD1,PD5,PD6 as inputs by setting (0)
+    DDRD &= ~_BV(PORTD0);
+    DDRD &= ~_BV(PORTD1);
+    DDRD &= ~_BV(PORTD5);
+    DDRD &= ~_BV(PORTD6);
+
     //Enable Interrupt Procedure
     //The following pins will trigger an interrupt at vector
     //PCINT2_vect
-    PCMSK2 |= (1<<PCINT21);
-    PCMSK2 |= (1<<PCINT22);
-    PCMSK2 |= (1<<PCINT16);
-    PCMSK2 |= (1<<PCINT17);
-    PCICR |= (1<<PCIE2);
-    
+    PCMSK2 |= _BV(PCINT21);
+    PCMSK2 |= _BV(PCINT22);
+    PCMSK2 |= _BV(PCINT16);
+    PCMSK2 |= _BV(PCINT17);
+    PCICR  |= _BV(PCIE2);
+
     right_direction = FORWARD;
     left_direction = FORWARD;
-    
+
     //Enable all interrupts
     sei();
-    
 }
 
 
@@ -58,7 +48,7 @@ void update_encoder (void){
     cli();
     //Now find out which motors changed and in which direction
     //using the following coding
-    
+
     //Encoding Table
     //__________________
     //Clockwise Rotation
@@ -93,7 +83,7 @@ void update_encoder (void){
                     right_turns--;
                 }
                 break;
-                
+
             case 1:
                 if(right_past_B){
                     if (right_direction == REVERSE) {
@@ -109,7 +99,7 @@ void update_encoder (void){
                     right_turns--;
                 }
                 break;
-                
+
             default:
                 break;
         }
@@ -117,7 +107,7 @@ void update_encoder (void){
         right_past_A = right_current_A;
         right_past_B = right_current_B;
     }
-    
+
     if (LEUF == true) {
         LEUF = false;
         switch(left_current_A){
@@ -138,7 +128,7 @@ void update_encoder (void){
                     left_turns--;
                 }
                 break;
-                
+
             case 1:
                 if(left_past_B){
                     if (left_direction == REVERSE) {
@@ -153,7 +143,7 @@ void update_encoder (void){
                     left_turns--;
                 }
                 break;
-                
+
             default:
                 break;
         }
@@ -166,9 +156,9 @@ void update_encoder (void){
 }
 
 void encoder_debug (void){
-    
+
     EUF = false;
-    
+
     //If the right motor is going forward
     //Turn on LED2
     if (right_direction == FORWARD) {
@@ -176,7 +166,7 @@ void encoder_debug (void){
     }else{
         PORTC &= ~(_BV(PORTC2));
     }
-    
+
     //If the left motor is going forward
     //Turn on LED3
     if (left_direction == FORWARD) {
@@ -184,6 +174,6 @@ void encoder_debug (void){
     }else{
         PORTC &= ~(_BV(PORTC3));
     }
-    
+
 }
 

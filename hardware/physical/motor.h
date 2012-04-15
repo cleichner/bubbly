@@ -1,13 +1,5 @@
-//
-//  motor.h
-//  
-//
-//  Created by Kevin Klug on 2/18/12.
-//
-
-
-#ifndef _motor_h
-#define _motor_h
+#ifndef MOTOR_H
+#define MOTOR_H
 
 //MACROS
 #define sbi(var, mask)   ((var) |= (uint8_t)(1 << mask))
@@ -22,11 +14,9 @@
 #define SPEED_UNIT	114
 #define AVERAGE	16
 
-//This is compared against the 10 bit ADC value and corresponds to roughly 1.5A on the Current Sense pin
-//from the Motor Controller
+// This is compared against the 10 bit ADC value and corresponds to roughly
+// 1.5A on the Current Sense pin from the Motor Controller
 #define CURRENT_THRESHOLD	150
-
-//FUNCTIONS
 
 void motor_init (void); //Initalizes Pins for PWM and ADC needed for ADC
 void motor_set_direction( char motor, char direction);

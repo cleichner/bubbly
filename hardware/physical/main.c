@@ -5,92 +5,70 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-//Digital ISR
-ISR(PCINT2_vect){
-    
-    //Check to see which pin has changed by comparing the value actually on the pin
-    //to the one stored in the respective variable. If there is a change, update current
-    
+// Pin Change ISR
+ISR(PCINT2_vect) {
+    //Check to see which pin has changed by comparing the value actually on the
+    //pin to the one stored in the respective variable. If there is a change,
+    //update current
+
     //Left motor
-    if( (PIND & PIND0) != left_current_A){
+    if ((PIND & _BV(PIND0)) != left_current_A){
         left_current_A = (PIND & PIND0);
         LEUF = true;
-        EUF = true; 
+        EUF = true;
     }
-    if( (PIND & PIND1) != left_current_B){
+    if ((PIND & _BV(PIND1)) != left_current_B){
         left_current_B = (PIND & PIND1);
         LEUF = true;
         EUF = true;
     }
-    
+
     //Right motor
-    if( (PIND & PIND5) != right_current_A){
+    if ((PIND & _BV(PIND5)) != right_current_A){
         right_current_A = (PIND & PIND5);
         REUF = true;
         EUF = true;
     }
-    if( (PIND & PIND6) != right_current_B){
+    if ((PIND & _BV(PIND6)) != right_current_B){
         right_current_B = (PIND & PIND6);
         REUF = true;
         EUF = true;
     }
-        
-    //Encoder Update Flag
-    sei();
-    
 }
 
-//ADC ISR
-ISR (ADC_vect){
-    cli();
-    
-    current = ADCL;
-    current |= ADCH<<8;
-    
-    if (current > CURRENT_THRESHOLD) {
+// ADC ISR
+ISR(ADC_vect) {
+    static uint8_t motor;
+
+    if (ADC > CURRENT_THRESHOLD) {
         //Stop all motors
         motor_set_speed( 'r', 0);
         motor_set_speed( 'l', 0);
     }
-    if (motor_current_monitor == '0') motor_current_monitor = '1';
-    else motor_current_monitor = '0';
-    
-    ADMUX = motor_current_monitor-'0';
-    
-    sei();
+
+    ADMUX = motor ? 0 : 1;
 }
 
-//MAIN FUNCTION 
 int main(void) {
-    
     enc_init();
     motor_init();
-    
+
     //Some debugging using LED2 and LED3 on the board
     //Configure Pins PC2 & PC3 as outputs
     DDRC |= _BV(PORTC2);
     DDRC |= _BV(PORTC3);
-    
-    
+
     //This is Debugging stuff
-    motor_set_direction('l', 'r');
-    motor_set_direction('r', 'r');
-    motor_set_speed('l',3);
-    motor_set_speed('r',3);
-    
+    motor_set_direction('l', 'f');
+    motor_set_direction('r', 'b');
+    motor_set_speed('l',9);
+    motor_set_speed('r',9);
+
     PORTC &= ~(_BV(PORTC2));
     PORTC &= ~(_BV(PORTC3));
-    
-    while (1){
-        
-        if (EUF) {
-            update_encoder();
-            encoder_debug();
-        }
 
+    while (1){
+        if (EUF)
+            update_encoder();
     }
 }
-
-
-
-

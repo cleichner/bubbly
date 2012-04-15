@@ -30,5 +30,6 @@ void update_encoder (void);
 //Will turn on LED2 & LED3 based on the directions of the motors
 void encoder_debug (void);
 
-#endif
+void encoder_debug_init (void);
 
+#endif

@@ -17,10 +17,11 @@ volatile uint8_t right_current_A;
 volatile uint8_t right_current_B;
 volatile uint8_t right_past_A;
 volatile uint8_t right_past_B;
+volatile uint8_t encoder_buff;
 
-// These count the number of turns
-volatile uint8_t right_turns;
-volatile uint8_t left_turns;
+//These count the number of turns
+volatile uint16_t right_turns;
+volatile uint16_t left_turns;
 
 // These indicate the last known direction
 volatile uint8_t right_direction;
@@ -45,4 +46,4 @@ volatile uint8_t REUF;
 #define PWM1	1
 #define PWM2	2
 
-#endif // ENCODER_H
+#endif // GLOBAL_H

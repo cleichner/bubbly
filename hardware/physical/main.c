@@ -42,15 +42,11 @@ ISR(PCINT2_vect){
 
     update_encoder();
     encoder_debug();
-
-    //Encoder Update Flag
-    sei();
 }
 
 // ADC ISR
 ISR (ADC_vect) {
     static uint8_t motor = 0;
-    cli();
 
     // Stop the motors on over-current
     if (ADC > CURRENT_THRESHOLD) {

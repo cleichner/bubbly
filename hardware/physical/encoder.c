@@ -37,8 +37,6 @@ void enc_init(void) {
     right_direction = FORWARD;
     left_direction = FORWARD;
 
-    //Enable all interrupts
-    sei();
 }
 
 void update_encoder(void) {
@@ -166,6 +164,7 @@ void encoder_debug_init(void) {
 
 //For this to work encoder_debug_init must be run prior!
 void encoder_debug(void) {
+    return;
     EUF = false;
 
     //If the right motor is going forward
